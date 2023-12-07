@@ -1,5 +1,6 @@
-#include "structure.h"
-
+#include "../headers/structure.h"
+#include <stdexcept>    // Para runtime_error
+#include <algorithm>    // Para find_if e remove_if
 
 // Construtor da classe EdgeNode
 EdgeNode::EdgeNode(vertex m_otherVertex, EdgeNode* m_next, int m_length)
@@ -112,3 +113,4 @@ void GraphAdjList::print()
         cout << endl;
     }
 }
+

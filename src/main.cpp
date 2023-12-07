@@ -1,5 +1,5 @@
 #include <iostream>
-#include "structure.h"
+#include "../headers/structure.h"
 
 using namespace std;
 
@@ -18,3 +18,4 @@ int main()
     g.addEdge(4, 1, 1);
     g.print();
 }
+
