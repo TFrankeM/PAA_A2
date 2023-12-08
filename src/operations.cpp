@@ -122,6 +122,108 @@ vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& 
 */
 
 
+vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph,
+                                                             Order order, 
+                                                             int DeliveryPersonId) 
+{
+
+    int sellerVertexId = order.getSellerAddress();
+    int clientVertexId = order.getClientAddress();
+    // A lista para armazenar a rota final
+    vector<EdgeNode*> route;
+
+    // Primeiro, encontrar o caminho do entregador até o vendedor
+    vector<int> pathToSeller = findPath(graph, DeliveryPersonId, sellerVertexId);
+    // Adiciona este caminho à rota
+    addToRoute(graph, route, pathToSeller);
+
+    // Depois, encontrar o caminho do vendedor até o cliente
+    vector<int> pathToClient = findPath(graph, sellerVertexId, clientVertexId);
+    // Adiciona este caminho à rota
+    addToRoute(graph, route, pathToClient);
+
+    // Retorna a rota completa
+    return route;
+}
+
+// Dijkstra para encontrar o menor caminho
+vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, int endVertexId) {
+    MinHeap heap;
+    vector<int> distances(graph.getNumVertices(), INT_MAX);
+    vector<bool> visited(graph.getNumVertices(), false);
+    vector<int> parents(graph.getNumVertices(), -1);
+
+    distances[startVertexId] = 0;
+    parents[startVertexId] = startVertexId;
+    heap.push({distances[startVertexId], startVertexId});
+
+
+
+    while (!heap.empty()) {
+        
+        int currentVertexId = heap.top().second; // Vertice com valor minimo
+        heap.pop(); // Remove Verice do Heap
+
+        if (distances[currentVertexId] == INT_MAX) { break; }
+
+        if (visited[currentVertexId]) continue;
+        visited[currentVertexId] = true;
+
+        if (currentVertexId == endVertexId) break;
+        EdgeNode* edge = graph.getEdges(currentVertexId);
+
+        while(edge){
+            int neighborVertexId = edge->otherVertex().getId();
+            if (!visited[neighborVertexId]) {
+                int edgeLength = edge->getLength();
+
+                if(distances[currentVertexId] + edgeLength < distances[neighborVertexId]){
+                    parents[neighborVertexId] = currentVertexId;
+                    distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
+                    heap.push({distances[neighborVertexId], neighborVertexId});
+                }
+                
+            }
+
+            edge = edge->getNext();
+        
+        }
+        visited[currentVertexId] = true;
+    }
+
+    // Reconstruir o caminho do destino de volta à origem
+    vector<int> path;
+    for (int at = endVertexId; at != -1; at = parents[at]) {
+        path.push_back(at);
+    }
+    reverse(path.begin(), path.end()); // O caminho está na ordem inversa
+    return path;
+}
+
+
+// Define a função que adiciona arestas ao vetor de rota com base em uma sequencia de vertices
+void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, vector<int> path) {
+    // Itera sobre cada vértice no caminho, exceto o último
+    for (size_t i = 0; i < path.size() - 1; ++i) {
+        // ID do vértice atual no caminho
+        int from = path[i];
+        // ID do próximo vértice no caminho
+        int to = path[i + 1];
+        
+        // Itera sobre as arestas que saem do vértice from
+        for (EdgeNode* edge = graph.getEdges(from); edge != nullptr; edge = edge->getNext()) {
+            // Verifica se a aresta conecta ao vértice to
+            if (edge->otherVertex().getId() == to) {
+                // Se sim, adiciona a aresta ao vetor route
+                route.push_back(edge);
+                // Sai do loop interno, pois a aresta correta foi encontrada
+                break;
+            }
+        }
+    }
+}
+
+
 /*
         OPERAÇÃO 3: definir a rota de uma entrega considerando centros de distribuição.
     - Caso o pedido seja otimizado, um entregador deverá coletar o produto em algum centro de distribuição, 
