@@ -12,6 +12,8 @@
         "string_view": "cpp",
         "random": "cpp",
         "iosfwd": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "iostream": "cpp"
     }
 }

@@ -1,9 +1,10 @@
 #include <iostream>
-#include "../headers/structure.h"
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <cmath>
+#include "../headers/txt_reader.h"
+
 
 using namespace std;
 
@@ -28,9 +29,9 @@ ordem "id" "id do cliente" "id do vendedor" "tipo" "id do produto"
 
 
 // Função que lê uma linha do tipo "vértice" e adiciona o vértice ao grafo
-void readVertex(istream& iss, int vertex_coords[][2])
+void readVertex(stringstream& iss, float vertex_coords[][2])
 {
-    int id; int x; int y;
+    int id; float x; float y;
     iss >> id >> x >> y;
 
     // Normaliza o ID do vértice
@@ -42,7 +43,7 @@ void readVertex(istream& iss, int vertex_coords[][2])
 
 
 // Função que lê uma linha do tipo "aresta" e adiciona a aresta ao grafo
-void readEdge(GraphAdjList& g, istream& iss, int vertex_coords[][2])
+void readEdge(GraphAdjList& g, stringstream& iss, float vertex_coords[][2])
 {
     int id1; int id2;
     iss >> id1 >> id2;
@@ -52,13 +53,14 @@ void readEdge(GraphAdjList& g, istream& iss, int vertex_coords[][2])
 
     // Calcula a distância entre os vértices
     float dist = sqrt(pow(vertex_coords[id1][0] - vertex_coords[id2][0], 2) + pow(vertex_coords[id1][1] - vertex_coords[id2][1], 2));
+
     g.addEdge(id1, id2, dist);
     g.addEdge(id2, id1, dist);
 }
 
 
 // Função que lê uma linha do tipo "produto" e adiciona o produto ao grafo
-void readProduct(GraphAdjList& g, istream& iss)
+void readProduct(GraphAdjList& g, stringstream& iss)
 {
     int id; double preco; double peso;
     iss >> id >> preco >> peso;
@@ -68,7 +70,7 @@ void readProduct(GraphAdjList& g, istream& iss)
 
 
 // Função que lê uma linha do tipo "vendedor" e adiciona o vendedor ao grafo
-void readSeller(GraphAdjList& g, istream& iss)
+void readSeller(GraphAdjList& g, stringstream& iss)
 {
     int id; int vertex1; int vertex2; float distance; int numProducts;
     iss >> id >> vertex1 >> vertex2 >> distance >> numProducts;
@@ -87,12 +89,14 @@ void readSeller(GraphAdjList& g, istream& iss)
 
     // Adiciona o vértice do vendedor
     g.addVertex(vertex1, vertex2, distance);
+    s.setAddress(g.getNumRealVertices()-1);
     g.getVertex(g.getNumRealVertices()-1).addSeller(s);
+    g.addSeller(s);
 }
 
 
 // Função que lê uma linha do tipo "entregador" e adiciona o entregador ao grafo
-void readDeliveryPerson(GraphAdjList& g, istream& iss)
+void readDeliveryPerson(GraphAdjList& g, stringstream& iss)
 {
     int id; int vertex1; int vertex2; float distance; int capacity;
     iss >> id >> vertex1 >> vertex2 >> distance >> capacity;
@@ -108,7 +112,7 @@ void readDeliveryPerson(GraphAdjList& g, istream& iss)
 
 
 // Função que lê uma linha do tipo "CD" e adiciona o centro de distribuição ao grafo
-void readDistributionCenter(GraphAdjList& g, istream& iss)
+void readDistributionCenter(GraphAdjList& g, stringstream& iss)
 {
     int id; int vertex1; int vertex2; float distance; int numProducts;
     iss >> id >> vertex1 >> vertex2 >> distance >> numProducts;
@@ -132,43 +136,45 @@ void readDistributionCenter(GraphAdjList& g, istream& iss)
 
 
 // Função que lê uma linha do tipo "cliente" e adiciona o cliente ao grafo
-void readClient(GraphAdjList& g, istream& iss)
+void readClient(GraphAdjList& g, stringstream& iss)
 {
     int id; int vertex1; int vertex2; float distance;
     iss >> id >> vertex1 >> vertex2 >> distance;
     Client c(id);
-    g.addClient(c);
 
     // Normaliza os IDs dos vértices
     vertex1--; vertex2--;
 
     // Adiciona o vértice do cliente
     g.addVertex(vertex1, vertex2, distance);
+    c.setAddress(g.getNumRealVertices()-1);
     g.getVertex(g.getNumRealVertices()-1).addClient(c);
+    g.addClient(c);
 }
 
 
 // Função que lê uma linha do tipo "ordem" e adiciona a ordem ao grafo
-void readOrder(GraphAdjList& g, istream& iss)
+void readOrder(GraphAdjList& g, stringstream& iss)
 {
-    int id; int client; string s_orderType; int product;
-    iss >> id >> client >> s_orderType >> product;
+    int id; int client; int seller; string s_orderType; int product;
+    iss >> id >> client >> seller >> s_orderType >> product;
 
     // Converte o tipo de ordem para o enum correspondente   
     OrderType orderType;
     if (s_orderType == "Simple") orderType = OrderType::Simple;
     else if (s_orderType == "Optimized") orderType = OrderType::Optimized;
-    
+
     Order o(id, g.getProduct(product), orderType);
+    o.setClientAddress(g.getClient(client).getAddress());
+    o.setSellerAddress(g.getSeller(seller).getAddress());
     g.getClient(client).addOrder(o);
 }
 
-
 // Função que lê uma linha e chama a função correspondente
-void readLine(GraphAdjList& g, string line, int vertex_coords[][2])
+void readLine(GraphAdjList& g, string line, float vertex_coords[][2])
 {
     // Separa a linha em palavras e pega a primeira (tipo)
-    istringstream iss(line);
+    stringstream iss(line);
     string type;
     iss >> type;
 
@@ -233,7 +239,7 @@ GraphAdjList readFile(string filename)
     GraphAdjList g(num_vertices, num_entities);
 
     // Inicializa a matriz de coordenadas dos vértices
-    int vertex_coords[num_vertices][2];
+    float vertex_coords[num_vertices][2];
 
     // Lê e processa cada linha do arquivo de entrada
     while (getline(file, line))

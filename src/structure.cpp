@@ -185,7 +185,11 @@ void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
     float length = edge->getLength();
     
     // Caso a distância não seja menor que a distância da aresta, retorna
-    if (distance > length) throw runtime_error("Distância maior que a distância da aresta");
+    if (distance > length){ 
+        cout << "Distância: " << distance << " | Comprimento da aresta: " << length << endl; // "Distância maior que a distância da aresta
+        cout << "Vértice 1: " << id_v1 << " | Vértice 2: " << id_v2 << endl;
+        throw runtime_error("Distância maior que a distância da aresta"); 
+        }
 
     // Adiciona o vértice no meio da aresta
     addEdge(id_v1, m_numRealVertices , distance);
@@ -236,6 +240,28 @@ Client GraphAdjList::getClient(const int& clientId)
     if (it == m_clients.end()) throw runtime_error("Cliente com ID " + to_string(clientId) + " não existe");
 
     // Retorna o cliente
+    return *it;
+}
+
+// Adiciona um vendendor ao grafo
+void GraphAdjList::addSeller(const Seller& seller)
+{
+    // Verifica se o vendedor já existe
+    auto it = find_if(m_sellers.begin(), m_sellers.end(), [&seller](const Seller& s) { return s.getId() == seller.getId(); });
+    if (it != m_sellers.end()) throw runtime_error("Vendedor já existe");
+
+    // Adiciona o vendedor ao grafo
+    m_sellers.push_back(seller);
+}
+
+// Pega um vendedor do grafo
+Seller GraphAdjList::getSeller(const int& sellerId)
+{
+    // Verifica se o vendedor existe
+    auto it = find_if(m_sellers.begin(), m_sellers.end(), [&sellerId](const Seller& s) { return s.getId() == sellerId; });
+    if (it == m_sellers.end()) throw runtime_error("Vendedor com ID " + to_string(sellerId) + " não existe");
+
+    // Retorna o vendedor
     return *it;
 }
 

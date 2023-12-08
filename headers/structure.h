@@ -1,3 +1,6 @@
+#ifndef STRUCTURE_H
+#define STRUCTURE_H
+
 #include <iostream>
 #include "client.h"
 #include "deliveryperson.h"
@@ -55,6 +58,7 @@ private:
     int m_numEdges;
     vector<Product> m_products;
     vector<Client> m_clients;
+    vector<Seller> m_sellers;
     EdgeNode** m_edges;
 
 public:
@@ -74,6 +78,9 @@ public:
 
     void addProduct(const Product& product);          // Adiciona um produto
     Product getProduct(const int& productId);         // Pega um produto
+
+    void addSeller(const Seller& seller);             // Adiciona um vendedor
+    Seller getSeller(const int& sellerId);            // Pega um vendedor
     
     void addClient(const Client& client);             // Adiciona um cliente
     Client getClient(const int& clientId);            // Pega um cliente
@@ -81,3 +88,4 @@ public:
     void print();                                     // Imprime o grafo
 };
 
+#endif

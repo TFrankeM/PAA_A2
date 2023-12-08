@@ -12,6 +12,7 @@ class Seller
 private:
     int id;                  // Identificador único para seller
     vector<Product> catalog;    // Uma lista de produtos que o vendedor oferece
+    int address;                // Endereço do vendedor
 
 public:
     // Construtor para inicializar um objeto Seller
@@ -24,6 +25,8 @@ public:
     void addProduct(const Product& product);            // Adiciona novo produto
     void removeProduct(const int& productId);        // Remove produto
     Product getProduct(const int& productId) const;  // Pega produto
+    int getAddress() const;                          // Pega endereço
+    void setAddress(const int& address);             // Atribui endereço
 };
 
 #endif
