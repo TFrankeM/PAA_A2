@@ -153,6 +153,35 @@ void GraphAdjList::removeEdge(int id_v1, int id_v2)
 // Retorna o número de arestas do grafo
 int GraphAdjList::getNumEdges() { return m_numEdges; }
 
+// Retorna as arestas de um vértice
+EdgeNode* GraphAdjList::getEdges(int id) { return m_edges[id]; }
+
+
+// Adiciona um vértice no meio de uma aresta (v1 -> v2)
+void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
+{
+    // Percorre todos os nós da lista de adjacência
+    EdgeNode* edge = m_edges[id_v1];
+    while (edge != nullptr)
+    {
+        // Se a aresta já existe, quebra o loop
+        if (edge->otherVertex().getId() == id_v2) break;
+        edge = edge->getNext();
+    }
+
+    // Caso a aresta não exista, retorna
+    if (edge == nullptr) return;
+
+    // Caso a distância não seja menor que a distância da aresta, retorna
+    if (distance >= edge->getLength()) return;
+
+    // Adiciona o vértice no meio da aresta
+    m_edges[id_v1] = new EdgeNode({m_numVertices}, m_edges[id_v1], distance);
+    m_edges[m_numVertices] = new EdgeNode({id_v2}, m_edges[m_numVertices], distance);
+    m_numVertices++;
+    m_numEdges++;
+}
+
 // Adiciona um produto ao grafo
 void GraphAdjList::addProduct(const Product& product)
 {

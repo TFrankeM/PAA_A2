@@ -172,8 +172,7 @@ void readLine(GraphAdjList& g, string line, int vertex_coords[][2])
     }
 }
 
-
-void readFile(GraphAdjList& g, string filename)
+GraphAdjList readFile(string filename)
 {
     // Abre o arquivo de entrada
     ifstream file;
@@ -204,6 +203,5 @@ void readFile(GraphAdjList& g, string filename)
 
     file.close();
 
-    // Imprime o grafo resultante
-    g.print();
+    return g;
 }

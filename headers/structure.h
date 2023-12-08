@@ -63,10 +63,13 @@ public:
     Vertex getVertex(int id);                         // Retorna um vértice
     int getNumVertices();                             // Retorna o número de vértices
     
-    void addEdge(int id_v1, int id_v2, float length); // Adiciona uma aresta
-    void removeEdge(int id_v1, int id_v2);            // Remove uma aresta
-    int getNumEdges();                                // Retorna o número de arestas
+    void addEdge(int id_v1, int id_v2, float length);     // Adiciona uma aresta
+    void removeEdge(int id_v1, int id_v2);                // Remove uma aresta
+    EdgeNode* getEdges(int id);                           // Retorna as arestas de um vértice
+    int getNumEdges();                                    // Retorna o número de arestas
     
+    void addVertex(int id_v1, int id_v2, float distance); // Adiciona um vértice no meio de uma aresta
+
     void addProduct(const Product& product);          // Adiciona um produto
     Product getProduct(const int& productId);         // Pega um produto
     
