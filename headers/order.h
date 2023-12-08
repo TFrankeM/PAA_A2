@@ -1,3 +1,5 @@
+#ifndef ORDER_H
+#define ORDER_H
 #include <string>
 #include <vector>
 #include "product.h"
@@ -29,3 +31,4 @@ public:
     OrderType getType() const;      // Pega o tipo do pedido
 };
 
+#endif

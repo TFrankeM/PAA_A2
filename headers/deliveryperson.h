@@ -1,3 +1,5 @@
+#ifndef DELIVERYPERSON_H
+#define DELIVERYPERSON_H
 #include <iostream>
 #include <vector>
 #include "order.h"
@@ -27,3 +29,4 @@ public:
     Order getOrder(const string& orderId) const;   // Retorna um pedido pelo ID
 };
 
+#endif

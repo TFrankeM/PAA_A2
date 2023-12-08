@@ -3,5 +3,5 @@
 Para executar o programa, basta compilar todos os arquivos .cpp, através do comando:
 
 ```
-g++ -o main *.cpp; ./main
+g++ -o main src/*.cpp; ./main
 ```

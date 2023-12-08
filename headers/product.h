@@ -1,3 +1,5 @@
+#ifndef PRODUCT_H
+#define PRODUCT_H
 #include <iostream>
 #include <vector>
 
@@ -25,3 +27,4 @@ public:
     void setWeight(double newWeight);           // Define um novo peso para o produto
 };
 
+#endif

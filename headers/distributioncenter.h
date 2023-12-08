@@ -1,3 +1,5 @@
+#ifndef DISTRIBUTIONCENTER_H
+#define DISTRIBUTIONCENTER_H
 #include <string>
 #include <map>
 #include "product.h"
@@ -22,3 +24,4 @@ public:
     bool isProductAvailable(const string& productId) const;        // Verifica se um produto está no centro
 };
 
+#endif

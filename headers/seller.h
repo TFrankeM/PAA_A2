@@ -1,3 +1,5 @@
+#ifndef SELER_H
+#define SELER_H
 #include <iostream>
 #include <vector>
 #include "product.h"
@@ -24,3 +26,4 @@ public:
     Product getProduct(const string& productId) const;  // Pega produto
 };
 
+#endif

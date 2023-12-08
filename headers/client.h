@@ -1,9 +1,10 @@
+#ifndef CLIENT_H
+#define CLIENT_H
 #include <vector>
 #include "order.h"
 
 using namespace std;
 
-/* Client Header*/
 class Client {
 private:
     string id;                  // Identificador único do cliente
@@ -19,3 +20,4 @@ public:
     vector<Order> getOrders() const;        // Pegar lista de pedidos do usuário
 };
 
+#endif

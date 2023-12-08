@@ -3,7 +3,6 @@
 
 using namespace std;
 
-typedef int vertex;
 
 int main()
 {
