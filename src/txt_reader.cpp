@@ -9,24 +9,32 @@ using namespace std;
 
 /* Modelo de Entrada (.txt):
 
-num_vértices "número de vértices"
+#vértices "número de vértices"
+#vendedores "número de vendedores"
+#entregadores "número de entregadores"
+#CDs "número de centros de distribuição"
+#clientes "número de clientes"
+
 vértice "id" "x" "y"
 aresta "id do vértice 1" "id do vértice 2"
 produto "id" "preço" "peso"
-vendedor "id" "id do vértice" "número de produtos" "id do produto 1" "id do produto 2" ...
-entregador "id" "id do vértice" "capacidade"
-CD "id" "id do vértice" "número de produtos" "id do produto 1" "quantidade do produto 1" "id do produto 2" "quantidade do produto 2" ...
-cliente "id" "id do vértice"
-ordem "id" "id do cliente" "tipo" "id do produto"
+vendedor "id" "vértice1" "vértice2" "distancia do vértice1" "número de produtos" "id do produto 1" "id do produto 2" ...
+entregador "id" "vértice1" "vértice2" "distancia do vértice1" "capacidade"
+CD "id" "vértice1" "vértice2" "distancia do vértice1" "número de produtos" "id do produto 1" "quantidade do produto 1" "id do produto 2" "quantidade do produto 2" ...
+cliente "id" "vértice1" "vértice2" "distancia do vértice1"
+ordem "id" "id do cliente" "id do vendedor" "tipo" "id do produto" 
 
 */
 
 
 // Função que lê uma linha do tipo "vértice" e adiciona o vértice ao grafo
-void readVertex(GraphAdjList& g, istream& iss, int vertex_coords[][2])
+void readVertex(istream& iss, int vertex_coords[][2])
 {
     int id; int x; int y;
     iss >> id >> x >> y;
+
+    // Normaliza o ID do vértice
+    id--;
 
     vertex_coords[id][0] = x;
     vertex_coords[id][1] = y;
@@ -39,9 +47,13 @@ void readEdge(GraphAdjList& g, istream& iss, int vertex_coords[][2])
     int id1; int id2;
     iss >> id1 >> id2;
 
+    // Normaliza os IDs dos vértices
+    id1--; id2--;
+
     // Calcula a distância entre os vértices
     float dist = sqrt(pow(vertex_coords[id1][0] - vertex_coords[id2][0], 2) + pow(vertex_coords[id1][1] - vertex_coords[id2][1], 2));
     g.addEdge(id1, id2, dist);
+    g.addEdge(id2, id1, dist);
 }
 
 
@@ -58,9 +70,12 @@ void readProduct(GraphAdjList& g, istream& iss)
 // Função que lê uma linha do tipo "vendedor" e adiciona o vendedor ao grafo
 void readSeller(GraphAdjList& g, istream& iss)
 {
-    int id; int vertex; int numProducts;
-    iss >> id >> vertex >> numProducts;
+    int id; int vertex1; int vertex2; float distance; int numProducts;
+    iss >> id >> vertex1 >> vertex2 >> distance >> numProducts;
     Seller s(id);
+
+    // Normaliza os IDs dos vértices
+    vertex1--; vertex2--;
 
     // Adiciona os produtos ao vendedor
     for (int i = 0; i < numProducts; i++)
@@ -70,26 +85,37 @@ void readSeller(GraphAdjList& g, istream& iss)
         s.addProduct(g.getProduct(idProduct));
     }
 
-    g.getVertex(vertex).addSeller(s);
+    // Adiciona o vértice do vendedor
+    g.addVertex(vertex1, vertex2, distance);
+    g.getVertex(g.getNumRealVertices()-1).addSeller(s);
 }
 
 
 // Função que lê uma linha do tipo "entregador" e adiciona o entregador ao grafo
 void readDeliveryPerson(GraphAdjList& g, istream& iss)
 {
-    int id; int vertex; double capacity;
-    iss >> id >> vertex >> capacity;
+    int id; int vertex1; int vertex2; float distance; int capacity;
+    iss >> id >> vertex1 >> vertex2 >> distance >> capacity;
     DeliveryPerson d(id, capacity);
-    g.getVertex(0).addDeliveryPerson(d);
+
+    // Normaliza os IDs dos vértices
+    vertex1--; vertex2--;
+
+    // Adiciona o vértice do entregador
+    g.addVertex(vertex1, vertex2, distance);
+    g.getVertex(g.getNumRealVertices()-1).addDeliveryPerson(d);
 }
 
 
 // Função que lê uma linha do tipo "CD" e adiciona o centro de distribuição ao grafo
 void readDistributionCenter(GraphAdjList& g, istream& iss)
 {
-    int id; int vertex; int numProducts;
-    iss >> id >> vertex >> numProducts;
+    int id; int vertex1; int vertex2; float distance; int numProducts;
+    iss >> id >> vertex1 >> vertex2 >> distance >> numProducts;
     DistributionCenter dc(id);
+
+    // Normaliza os IDs dos vértices
+    vertex1--; vertex2--;
 
     // Adiciona os produtos ao centro de distribuição
     for (int i = 0; i < numProducts; i++)
@@ -99,18 +125,26 @@ void readDistributionCenter(GraphAdjList& g, istream& iss)
         dc.addProduct(g.getProduct(idProduct), quantity);
     }
 
-    g.getVertex(0).addDistributionCenter(dc);
+    // Adiciona o vértice do centro de distribuição
+    g.addVertex(vertex1, vertex2, distance);
+    g.getVertex(g.getNumRealVertices()-1).addDistributionCenter(dc);
 }
 
 
 // Função que lê uma linha do tipo "cliente" e adiciona o cliente ao grafo
 void readClient(GraphAdjList& g, istream& iss)
 {
-    int id; int vertex;
-    iss >> id >> vertex;
+    int id; int vertex1; int vertex2; float distance;
+    iss >> id >> vertex1 >> vertex2 >> distance;
     Client c(id);
     g.addClient(c);
-    g.getVertex(0).addClient(c);
+
+    // Normaliza os IDs dos vértices
+    vertex1--; vertex2--;
+
+    // Adiciona o vértice do cliente
+    g.addVertex(vertex1, vertex2, distance);
+    g.getVertex(g.getNumRealVertices()-1).addClient(c);
 }
 
 
@@ -140,8 +174,8 @@ void readLine(GraphAdjList& g, string line, int vertex_coords[][2])
 
     if (type == "vértice")
     {
-        readVertex(g, iss, vertex_coords);
-    } 
+        readVertex(iss, vertex_coords);
+    }
     else if (type == "aresta")
     {
         readEdge(g, iss, vertex_coords);
@@ -185,12 +219,18 @@ GraphAdjList readFile(string filename)
 
     // Lê o número de vértices do arquivo
     getline(file, line);
-    istringstream iss(line);
-    int num_vertices;
-    iss >> num_vertices;
+    int num_vertices = stoi(line.substr(line.find(" ")));
+
+    // Lê o número de entidades do arquivo
+    int num_entities = 0;
+    while (getline(file, line))
+    {
+        if (line[0] != '#') break;
+        num_entities += stoi(line.substr(line.find(" ")));
+    }
 
     // Inicializa o grafo
-    GraphAdjList g(num_vertices);
+    GraphAdjList g(num_vertices, num_entities);
 
     // Inicializa a matriz de coordenadas dos vértices
     int vertex_coords[num_vertices][2];

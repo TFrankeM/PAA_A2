@@ -65,22 +65,23 @@ void EdgeNode::setNext(EdgeNode* next) { m_next = next; }
 
 
 // Construtor da classe GraphAdjList
-GraphAdjList::GraphAdjList(int numVertices)
-    : m_numVertices(numVertices)
+GraphAdjList::GraphAdjList(int numRealVertices, int numEntities)
+    : m_numVertices(numRealVertices + numEntities)
+    , m_numRealVertices(numRealVertices)
     , m_numEdges(0)
     , m_edges(nullptr)
     , m_products()
     , m_clients()
 {
-    m_edges = new EdgeNode*[numVertices]; // Aloca espaço em memória para a lista de adjacência
-    for (int i = 0; i < numVertices; i++) m_edges[i] = nullptr; // Inicializa a lista de adjacência 
+    m_edges = new EdgeNode*[m_numVertices]; // Aloca espaço em memória para a lista de adjacência
+    for (int i = 0; i < m_numVertices; i++) m_edges[i] = nullptr; // Inicializa a lista de adjacência 
 }
 
 // Destrutor da classe GraphAdjList
 GraphAdjList::~GraphAdjList()
 {
     // Percorre todos os vértices do grafo
-    for (int i = 1; i <= m_numVertices; i++)
+    for (int i = 0; i < m_numVertices; i++)
     {
         EdgeNode* edge = m_edges[i];
 
@@ -101,14 +102,22 @@ GraphAdjList::~GraphAdjList()
 Vertex GraphAdjList::getVertex(int id)
 {
     // Verifica se o vértice existe
-    if (id < 0 || id > m_numVertices) throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
+    if (id < 0 || id >= m_numVertices) throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
 
     // Retorna o vértice
-    return Vertex(id);
+    for (int i = 0; i < m_numVertices; i++)
+    {
+        if (m_edges[i]->otherVertex().getId() == id) return m_edges[i]->otherVertex();
+    }
+
+    throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
 }
 
 // Retorna o número de vértices do grafo
 int GraphAdjList::getNumVertices() { return m_numVertices; }
+
+// Retorna o número de vértices reais do grafo
+int GraphAdjList::getNumRealVertices() { return m_numRealVertices; }
 
 
 // Adiciona uma aresta ao grafo (v1 -> v2)
@@ -157,6 +166,7 @@ int GraphAdjList::getNumEdges() { return m_numEdges; }
 EdgeNode* GraphAdjList::getEdges(int id) { return m_edges[id]; }
 
 
+
 // Adiciona um vértice no meio de uma aresta (v1 -> v2)
 void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
 {
@@ -172,14 +182,17 @@ void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
     // Caso a aresta não exista, retorna
     if (edge == nullptr) return;
 
+    float length = edge->getLength();
+    
     // Caso a distância não seja menor que a distância da aresta, retorna
-    if (distance >= edge->getLength()) return;
+    if (distance > length) throw runtime_error("Distância maior que a distância da aresta");
 
     // Adiciona o vértice no meio da aresta
-    m_edges[id_v1] = new EdgeNode({m_numVertices}, m_edges[id_v1], distance);
-    m_edges[m_numVertices] = new EdgeNode({id_v2}, m_edges[m_numVertices], distance);
-    m_numVertices++;
-    m_numEdges++;
+    addEdge(id_v1, m_numRealVertices , distance);
+    addEdge(m_numRealVertices, id_v2, length - distance);
+    
+    addEdge(m_numRealVertices, id_v1, distance);
+    addEdge(id_v2, m_numRealVertices++, length - distance);
 }
 
 // Adiciona um produto ao grafo
@@ -236,7 +249,7 @@ void GraphAdjList::print()
         for (EdgeNode* edge = m_edges[i]; edge != nullptr; edge = edge->getNext())
         {
             // Imprime a aresta (i -> edge->otherVertex())
-            cout << i << " -> " << edge->otherVertex().getId() << " (" << edge->getLength() << ") ";
+            cout << i + 1 << " -> " << edge->otherVertex().getId() + 1 << " (" << edge->getLength() << ") ";
         }
         cout << endl;
     }
