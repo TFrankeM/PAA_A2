@@ -3,12 +3,12 @@
 #include "../headers/seller.h"
 
 // Construtor da classe vendedor
-Seller::Seller(const string& sellerId)
+Seller::Seller(const int& sellerId)
     : id(sellerId)
 {}
 
 // Retorna o ID do vendedor
-string Seller::getId() const { return id; }
+int Seller::getId() const { return id; }
 
 // Adiciona novo produto ao catálogo do vendedor
 void Seller::addProduct(const Product& product) 
@@ -17,7 +17,7 @@ void Seller::addProduct(const Product& product)
 }
 
 // Remove um produto do catálogo do vendedor pelo seu ID
-void Seller::removeProduct(const string& productId) 
+void Seller::removeProduct(const int& productId) 
 {
     // O algoritmo remove_if reorganiza os elementos no intervalo [begin, end)
     // e retorna um iterador para o novo final desse intervalo.
@@ -31,7 +31,7 @@ void Seller::removeProduct(const string& productId)
 }
 
 // Recupera um produto do catálogo do vendedor pelo seu ID
-Product Seller::getProduct(const string& productId) const 
+Product Seller::getProduct(const int& productId) const 
 {
     // O algoritmo find_if procura por um elemento para o qual o fornecido
     // predicado retorna verdadeiro e retorna um iterador para ele.

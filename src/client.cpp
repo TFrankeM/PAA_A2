@@ -1,12 +1,12 @@
 #include "../headers/client.h"
 
 // Construtor da classe Cliente
-Client::Client(const string& clientId)
+Client::Client(const int& clientId)
     : id(clientId)
 {}
 
 // Retorna o ID do cliente
-string Client::getId() const {
+int Client::getId() const {
     return id;
 }
 

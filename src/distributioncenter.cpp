@@ -1,24 +1,25 @@
 #include "../headers/distributioncenter.h"
 
 // Construtor
-DistributionCenter::DistributionCenter(const string& centerId)
+DistributionCenter::DistributionCenter(const int& centerId)
     : id(centerId) 
 {}
 
 // Retorna o ID do centro de distribuição
-string DistributionCenter::getId() const 
+int DistributionCenter::getId() const 
 {
     return id;
 }
 
 // Adiciona produto ao inventário
-void DistributionCenter::addProduct(const string& productId, int quantity) 
+void DistributionCenter::addProduct(Product product, int quantity) 
 {
+    int productId = product.getId();
     inventory[productId] += quantity;
 }
 
 // Remove produto do inventário
-void DistributionCenter::removeProduct(const string& productId) 
+void DistributionCenter::removeProduct(const int& productId) 
 {
     // Verifica se o produto está no inventário (se não estiver, aponta para null)
     auto it = inventory.find(productId);
@@ -37,13 +38,13 @@ void DistributionCenter::removeProduct(const string& productId)
 }
 
 // Retorna o inventário
-map<string, int> DistributionCenter::getInventory() const 
+map<int, int> DistributionCenter::getInventory() const 
 {
     return inventory;
 }
 
 // Retorna se um produto está no inventário do centro de distribuição
-bool DistributionCenter::isProductAvailable(const string& productId) const 
+bool DistributionCenter::isProductAvailable(const int& productId) const 
 {
     auto it = inventory.find(productId);
     return it != inventory.end() && it->second > 0;         // Ele deve estar no CD e com quantidade maio que zero

@@ -43,7 +43,7 @@ vector<Seller> Vertex::getSellers() { return sellers; }
 
 
 // Construtor da classe EdgeNode
-EdgeNode::EdgeNode(Vertex m_otherVertex, EdgeNode* m_next, int m_length)
+EdgeNode::EdgeNode(Vertex m_otherVertex, EdgeNode* m_next, float m_length)
     : m_otherVertex(m_otherVertex)
     , m_next(m_next)
     , m_length(m_length)
@@ -56,7 +56,7 @@ Vertex EdgeNode::otherVertex() { return m_otherVertex; }
 EdgeNode* EdgeNode::getNext() { return m_next; }
 
 // Retorna o comprimento da aresta
-int EdgeNode::getLength() { return m_length; }
+float EdgeNode::getLength() { return m_length; }
 
 // Atribui o próximo nó com tamanho length
 void EdgeNode::setNext(EdgeNode* next) { m_next = next; }
@@ -69,6 +69,8 @@ GraphAdjList::GraphAdjList(int numVertices)
     : m_numVertices(numVertices)
     , m_numEdges(0)
     , m_edges(nullptr)
+    , m_products()
+    , m_clients()
 {
     m_edges = new EdgeNode*[numVertices]; // Aloca espaço em memória para a lista de adjacência
     for (int i = 0; i < numVertices; i++) m_edges[i] = nullptr; // Inicializa a lista de adjacência 
@@ -78,7 +80,7 @@ GraphAdjList::GraphAdjList(int numVertices)
 GraphAdjList::~GraphAdjList()
 {
     // Percorre todos os vértices do grafo
-    for (int i = 0; i < m_numVertices; i++)
+    for (int i = 1; i <= m_numVertices; i++)
     {
         EdgeNode* edge = m_edges[i];
 
@@ -95,8 +97,22 @@ GraphAdjList::~GraphAdjList()
     delete[] m_edges;
 }
 
+// Retorna um vértice do grafo
+Vertex GraphAdjList::getVertex(int id)
+{
+    // Verifica se o vértice existe
+    if (id < 0 || id > m_numVertices) throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
+
+    // Retorna o vértice
+    return Vertex(id);
+}
+
+// Retorna o número de vértices do grafo
+int GraphAdjList::getNumVertices() { return m_numVertices; }
+
+
 // Adiciona uma aresta ao grafo (v1 -> v2)
-void GraphAdjList::addEdge(int id_v1, int id_v2, int length)
+void GraphAdjList::addEdge(int id_v1, int id_v2, float length)
 {
     // Percorre todos os nós da lista de adjacência
     EdgeNode* edge = m_edges[id_v1];
@@ -133,6 +149,54 @@ void GraphAdjList::removeEdge(int id_v1, int id_v2)
         edge = edge->getNext();
     }
 }
+
+// Retorna o número de arestas do grafo
+int GraphAdjList::getNumEdges() { return m_numEdges; }
+
+// Adiciona um produto ao grafo
+void GraphAdjList::addProduct(const Product& product)
+{
+    // Verifica se o produto já existe
+    auto it = find_if(m_products.begin(), m_products.end(), [&product](const Product& p) { return p.getId() == product.getId(); });
+    if (it != m_products.end()) throw runtime_error("Produto já existe");
+
+    // Adiciona o produto ao grafo
+    m_products.push_back(product);
+}
+
+// Pega um produto do grafo
+Product GraphAdjList::getProduct(const int& productId)
+{
+    // Verifica se o produto existe
+    auto it = find_if(m_products.begin(), m_products.end(), [&productId](const Product& p) { return p.getId() == productId; });
+    if (it == m_products.end()) throw runtime_error("Produto não existe");
+
+    // Retorna o produto
+    return *it;
+}
+
+// Adiciona um cliente ao grafo
+void GraphAdjList::addClient(const Client& client)
+{
+    // Verifica se o cliente já existe
+    auto it = find_if(m_clients.begin(), m_clients.end(), [&client](const Client& c) { return c.getId() == client.getId(); });
+    if (it != m_clients.end()) throw runtime_error("Cliente já existe");
+
+    // Adiciona o cliente ao grafo
+    m_clients.push_back(client);
+}
+
+// Pega um cliente do grafo
+Client GraphAdjList::getClient(const int& clientId)
+{
+    // Verifica se o cliente existe
+    auto it = find_if(m_clients.begin(), m_clients.end(), [&clientId](const Client& c) { return c.getId() == clientId; });
+    if (it == m_clients.end()) throw runtime_error("Cliente com ID " + to_string(clientId) + " não existe");
+
+    // Retorna o cliente
+    return *it;
+}
+
 
 // Imprime o grafo
 void GraphAdjList::print()

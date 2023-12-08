@@ -1,14 +1,14 @@
 #include "../headers/product.h"
 
 // Constructor da classe produto
-Product::Product(const string& prodId, double prodPrice, double prodWeight)
+Product::Product(const int& prodId, double prodPrice, double prodWeight)
     : id(prodId)
     , price(prodPrice)
     , weight(prodWeight) 
 {}
 
 // retorna o produto ID
-std::string Product::getId() const { return id; }
+int Product::getId() const { return id; }
 
 // Retorna o preço do produto
 double Product::getPrice() const { return price; }

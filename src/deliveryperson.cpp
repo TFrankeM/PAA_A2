@@ -3,13 +3,13 @@
 #include "../headers/deliveryperson.h"
 
 // Construtor da classe entregador
-DeliveryPerson::DeliveryPerson(const string& deliveryPersonId, double maxCapacity)
+DeliveryPerson::DeliveryPerson(const int& deliveryPersonId, double maxCapacity)
     : id(deliveryPersonId)
     , capacity(maxCapacity) 
 {}
 
 // Retorna o ID do entregador
-string DeliveryPerson::getId() const { return id; }
+int DeliveryPerson::getId() const { return id; }
 
 // Retorna a capacidade de transporte
 double DeliveryPerson::getCapacity() const { return capacity; }
@@ -31,7 +31,7 @@ bool DeliveryPerson::assignOrder(const Order& order)
 }
 
 // Completa uma entrega e remove ela da lista
-void DeliveryPerson::completeOrder(const string& orderId) 
+void DeliveryPerson::completeOrder(const int& orderId) 
 {
     // O algoritmo remove_if encontra e remove uma entrega com ID específico
     auto it = find_if(orders.begin(), orders.end(),
@@ -46,7 +46,7 @@ void DeliveryPerson::completeOrder(const string& orderId)
 }
 
 // Recupera uma entrega com ID específico
-Order DeliveryPerson::getOrder(const std::string& orderId) const 
+Order DeliveryPerson::getOrder(const int& orderId) const 
 {
     // find_if encontra a primeira entrega com ID espefífico
     auto it = find_if(orders.begin(), orders.end(),

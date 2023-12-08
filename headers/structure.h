@@ -35,13 +35,13 @@ class EdgeNode
 private:
     Vertex m_otherVertex;
     EdgeNode* m_next;
-    int m_length;
+    float m_length;
 
 public:
-    EdgeNode(Vertex m_otherVertex, EdgeNode* m_next, int m_length); // Construtor
+    EdgeNode(Vertex m_otherVertex, EdgeNode* m_next, float m_length); // Construtor
     Vertex otherVertex();           // Retorna o vértice de destino
     EdgeNode* getNext();            // Retorna o próximo nó
-    int getLength();                // Retorna o comprimento da aresta
+    float getLength();                // Retorna o comprimento da aresta
     void setNext(EdgeNode* next);   // Atribui o próximo nó
 };
 
@@ -52,13 +52,27 @@ class GraphAdjList
 private:
     int m_numVertices;
     int m_numEdges;
+    vector<Product> m_products;
+    vector<Client> m_clients;
     EdgeNode** m_edges;
 
 public:
-    GraphAdjList(int numVertices);                  // Construtor
-    ~GraphAdjList();                                // Destrutor
-    void addEdge(int id_v1, int id_v2, int length); // Adiciona uma aresta
-    void removeEdge(int id_v1, int id_v2);          // Remove uma aresta
-    void print();                                   // Imprime o grafo
+    GraphAdjList(int numVertices);                    // Construtor
+    ~GraphAdjList();                                  // Destrutor
+    
+    Vertex getVertex(int id);                         // Retorna um vértice
+    int getNumVertices();                             // Retorna o número de vértices
+    
+    void addEdge(int id_v1, int id_v2, float length); // Adiciona uma aresta
+    void removeEdge(int id_v1, int id_v2);            // Remove uma aresta
+    int getNumEdges();                                // Retorna o número de arestas
+    
+    void addProduct(const Product& product);          // Adiciona um produto
+    Product getProduct(const int& productId);         // Pega um produto
+    
+    void addClient(const Client& client);             // Adiciona um cliente
+    Client getClient(const int& clientId);            // Pega um cliente
+    
+    void print();                                     // Imprime o grafo
 };
 

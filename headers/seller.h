@@ -10,20 +10,20 @@ using namespace std;
 class Seller 
 {
 private:
-    string id;                  // Identificador único para seller
+    int id;                  // Identificador único para seller
     vector<Product> catalog;    // Uma lista de produtos que o vendedor oferece
 
 public:
     // Construtor para inicializar um objeto Seller
-    Seller(const string& sellerId);
+    Seller(const int& sellerId);
 
     // Métodos de acesso para retornar atributos seller ID
-    string getId() const;
+    int getId() const;
 
     // Métodos de mudança para trocar atributos do produto
     void addProduct(const Product& product);            // Adiciona novo produto
-    void removeProduct(const string& productId);        // Remove produto
-    Product getProduct(const string& productId) const;  // Pega produto
+    void removeProduct(const int& productId);        // Remove produto
+    Product getProduct(const int& productId) const;  // Pega produto
 };
 
 #endif
