@@ -7,6 +7,32 @@ MinHeap::MinHeap()
     : size(0) 
 {}
 
+void MinHeap::heapify(int index) 
+{
+    int smallest = index;   // Índice atual
+    
+    // Calcula o índice dos nós filhos da esquerda e direita
+    int left = 2 * index + 1;
+    int right = 2 * index + 2;
+
+    // Se o nó filho da esquerda estiver no heap e for menor que o nó atual
+    if (left < size && heap[left].first < heap[smallest].first) {
+        smallest = left;        // Redefinimos o nó atual
+    }
+
+    // Se o nó filho da direita estiver no heap e for menor que o nó atual
+    if (right < size && heap[right].first < heap[smallest].first) {
+        smallest = right;       // Redefinimos o nó atual
+    }
+
+    // Se o menor nó não é o nó de ínicio, trocamos o nó de início com o menor 
+    // nó e executamos heapify recursivamente na subárvore
+    if (smallest != index) {
+        swap(heap[index], heap[smallest]);
+        heapify(smallest);
+    }
+}
+
 // Adiciona novo elemento ao heap
 void MinHeap::push(pair<int, int> element) 
 {
