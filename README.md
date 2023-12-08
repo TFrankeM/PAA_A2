@@ -25,13 +25,13 @@
 <hr>
 
 <h3>Inicialização:</h3>
-<p>
+<p align="justify">
     Certifique-se de fazer o download completo deste repositório. Para executar o programa, compile todos os arquivos <i>.cpp</i> usando o seguinte comando no terminal do seu computador:
+</p>
 
-    ```
-    cd "/caminho/ate/o/diretorio/src/" && g++ -o main *.cpp; ./main
-    ```
-
+	cd "/caminho/ate/o/diretorio/src/" && g++ -o main *.cpp; ./main
+ 
+<p align="justify">
     Substitua <i>/caminho/ate/o/diretorio/src/</i> pelo caminho do diretório atual até a pasta "src".
 </p>
 
