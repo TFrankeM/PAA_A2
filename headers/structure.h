@@ -51,17 +51,19 @@ class GraphAdjList
 {
 private:
     int m_numVertices;
+    int m_numRealVertices;
     int m_numEdges;
     vector<Product> m_products;
     vector<Client> m_clients;
     EdgeNode** m_edges;
 
 public:
-    GraphAdjList(int numVertices);                    // Construtor
-    ~GraphAdjList();                                  // Destrutor
+    GraphAdjList(int numRealVertices, int numEntities = 0); // Construtor
+    ~GraphAdjList();                                    // Destrutor
     
     Vertex getVertex(int id);                         // Retorna um vértice
     int getNumVertices();                             // Retorna o número de vértices
+    int getNumRealVertices();                         // Retorna o número de vértices reais
     
     void addEdge(int id_v1, int id_v2, float length);     // Adiciona uma aresta
     void removeEdge(int id_v1, int id_v2);                // Remove uma aresta
