@@ -16,9 +16,11 @@
 */
 
 vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& graph, 
-                                                                  int startVertexId, 
+                                                                  Order order, 
                                                                   int numDeliveryPeople) 
 {
+    int startVertexId = order.getSellerAddress();
+
     // Obtém número |V| de vértices do grafo
     int m_numVertices = graph.getNumVertices();
 

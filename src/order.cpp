@@ -19,3 +19,9 @@ double Order::getTotalWeight() const { return product.getWeight(); }
 // Retorna o tipo do pedido
 OrderType Order::getType() const { return type; }
 
+// Retorna o endereço do vendedor (ou do centro de distribuição)
+int Order::getSellerAddress() const { return sellerAddress; }
+
+// Retorna o endereço do cliente
+int Order::getClientAddress() const { return clientAddress; }
+

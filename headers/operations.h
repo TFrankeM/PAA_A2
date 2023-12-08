@@ -10,7 +10,7 @@ using namespace std;
 class GraphOperations {
 public:
     // Encontra os n entregadores mais próximos de um dado vértice
-    static vector<pair<int, int>> findNearestDeliveryPeople(GraphAdjList& graph, int startVertexId, int numDeliveryPeople);
+    static vector<pair<int, int>> findNearestDeliveryPeople(GraphAdjList& graph, Order order, int numDeliveryPeople);
 
     // Mais operações
 };
