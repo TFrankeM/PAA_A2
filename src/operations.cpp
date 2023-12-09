@@ -126,7 +126,6 @@ vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph
                                                              Order order, 
                                                              int DeliveryPersonId) 
 {
-
     int sellerVertexId = order.getSellerAddress();
     int clientVertexId = order.getClientAddress();
     // A lista para armazenar a rota final
@@ -149,7 +148,7 @@ vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph
 // Dijkstra para encontrar o menor caminho
 vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, int endVertexId) {
     MinHeap heap;
-    vector<int> distances(graph.getNumVertices(), INT_MAX);
+    vector<int> distances(graph.getNumVertices(), numeric_limits<int>::max());
     vector<bool> visited(graph.getNumVertices(), false);
     vector<int> parents(graph.getNumVertices(), -1);
 
@@ -164,7 +163,7 @@ vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, in
         int currentVertexId = heap.top().second; // Vertice com valor minimo
         heap.pop(); // Remove Verice do Heap
 
-        if (distances[currentVertexId] == INT_MAX) { break; }
+        if (distances[currentVertexId] == numeric_limits<int>::max()) { break; }
 
         if (visited[currentVertexId]) continue;
         visited[currentVertexId] = true;
@@ -234,6 +233,49 @@ void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, 
     entregador, o centro de distribuição, e a lista de segmentos representando a rota.
 */
 
+// Pseudocode for Dijkstra's Algorithm
+map<int, int> runDijkstra(GraphAdjList& graph, int startVertex);
+
+#include <queue>
+#include <vector>
+#include <map>
+
+struct Path {
+    int deliveryPersonId;
+    int totalDistance;
+    int cdId;
+
+    bool operator>(const Path& other) const {
+        return totalDistance > other.totalDistance;
+    }
+};
+
+// Min-Heap (Priority Queue)
+priority_queue<Path, vector<Path>, greater<>> minHeap;
+
+void findBestDeliveryRoutes(GraphAdjList& graph, const vector<int>& cdsWithProduct, int clientId, int numDeliveryPeople) {
+    for (int cdId : cdsWithProduct) {
+        auto distancesFromCD = runDijkstra(graph, cdId);
+        int distanceToClient = distancesFromCD[clientId];
+
+        for (auto& deliveryPerson : graph.getDeliveryPeople()) {
+            int deliveryPersonId = deliveryPerson.getId();
+            int distanceToDeliveryPerson = distancesFromCD[deliveryPersonId];
+            int totalDistance = distanceToClient + distanceToDeliveryPerson;
+
+            Path path = {deliveryPersonId, totalDistance, cdId};
+            minHeap.push(path);
+        }
+    }
+
+    vector<Path> selectedPaths;
+    for (int i = 0; i < numDeliveryPeople && !minHeap.empty(); ++i) {
+        selectedPaths.push_back(minHeap.top());
+        minHeap.pop();
+    }
+
+    // selectedPaths now contains the best routes
+}
 
 /*
         OPERAÇÃO 4: sugerir entregas adicionais com base em uma rota.
