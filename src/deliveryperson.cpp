@@ -60,3 +60,15 @@ Order DeliveryPerson::getOrder(const int& orderId) const
     }
     throw runtime_error("Order not found"); // Ordem não encontrada, retorna exceção
 }
+
+// Retorna o endereço do cliente
+int DeliveryPerson::getAddress() const 
+{
+    return address;
+}
+
+// Atribui o endereço do cliente
+void DeliveryPerson::setAddress(const int& address) 
+{
+    this->address = address;
+}
