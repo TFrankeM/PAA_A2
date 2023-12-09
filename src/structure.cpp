@@ -5,52 +5,52 @@
 
 // Construtor da classe Vertex
 Vertex::Vertex(int id)
-    : id(id),
-    clients(),
-    deliveryPeople(),
-    distributionCenters(),
-    sellers()
+    : id(id)
+    , client(nullptr)
+    , deliveryPerson(nullptr)
+    , distributionCenter(nullptr)
+    , seller(nullptr)
 {}
 
 // Retorna o id do vértice
 int Vertex::getId() { return id; }
 
 // Adiciona um cliente
-void Vertex::addClient(const Client& client) { clients.push_back(client); }
+void Vertex::addClient(const Client& client) { this->client = new Client(client); }
 
 // Adiciona um entregador
-void Vertex::addDeliveryPerson(const DeliveryPerson& deliveryPerson) { deliveryPeople.push_back(deliveryPerson); }
+void Vertex::addDeliveryPerson(const DeliveryPerson& deliveryPerson) { this->deliveryPerson = new DeliveryPerson(deliveryPerson); }
 
 // Adiciona um centro de distribuição
-void Vertex::addDistributionCenter(const DistributionCenter& distributionCenter) { distributionCenters.push_back(distributionCenter); }
+void Vertex::addDistributionCenter(const DistributionCenter& distributionCenter) { this->distributionCenter = new DistributionCenter(distributionCenter); }
 
 // Adiciona um vendedor
-void Vertex::addSeller(const Seller& seller) { sellers.push_back(seller); }
+void Vertex::addSeller(const Seller& seller) { this->seller = new Seller(seller); }
 
-// Retorna a lista de clientes
-vector<Client> Vertex::getClients() { return clients; }
+// Retorna o cliente
+Client* Vertex::getClient() { return client; }
 
-// Retorna a lista de entregadores
-vector<DeliveryPerson> Vertex::getDeliveryPeople() { return deliveryPeople; }
+// Retorna o entregador
+DeliveryPerson* Vertex::getDeliveryPerson() { return deliveryPerson; }
 
-// Retorna a lista de centros de distribuição
-vector<DistributionCenter> Vertex::getDistributionCenters() { return distributionCenters; }
+// Retorna o centro de distribuição
+DistributionCenter* Vertex::getDistributionCenter() { return distributionCenter; }
 
-// Retorna a lista de vendedores
-vector<Seller> Vertex::getSellers() { return sellers; }
+// Retorna o vendedor
+Seller* Vertex::getSeller() { return seller; }
 
 // ==============================================
 
 
 // Construtor da classe EdgeNode
-EdgeNode::EdgeNode(Vertex m_otherVertex, EdgeNode* m_next, float m_length)
+EdgeNode::EdgeNode(Vertex* m_otherVertex, EdgeNode* m_next, float m_length)
     : m_otherVertex(m_otherVertex)
     , m_next(m_next)
     , m_length(m_length)
 {}
 
 // Retorna o vértice de destino
-Vertex EdgeNode::otherVertex() { return m_otherVertex; }
+Vertex* EdgeNode::otherVertex() { return m_otherVertex; }
 
 // Retorna o próximo nó
 EdgeNode* EdgeNode::getNext() { return m_next; }
@@ -99,7 +99,7 @@ GraphAdjList::~GraphAdjList()
 }
 
 // Retorna um vértice do grafo
-Vertex GraphAdjList::getVertex(int id)
+Vertex* GraphAdjList::getVertex(int id)
 {
     // Verifica se o vértice existe
     if (id < 0 || id >= m_numVertices) throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
@@ -109,7 +109,7 @@ Vertex GraphAdjList::getVertex(int id)
     {
         for (EdgeNode* edge = m_edges[i]; edge != nullptr; edge = edge->getNext())
         {
-            if (edge->otherVertex().getId() == id) return edge->otherVertex();
+            if (edge->otherVertex()->getId() == id) return (edge->otherVertex());
         }
     }
 
@@ -131,12 +131,13 @@ void GraphAdjList::addEdge(int id_v1, int id_v2, float length)
     while (edge != nullptr)
     {
         // Se a aresta já existe, retorna
-        if (edge->otherVertex().getId() == id_v2) return;
+        if (edge->otherVertex()->getId() == id_v2) return;
         edge = edge->getNext();
     }
     
     // Adiciona a aresta ao grafo
-    m_edges[id_v1] = new EdgeNode({id_v2}, m_edges[id_v1], length);
+    Vertex* new_vertex = new Vertex(id_v2);
+    m_edges[id_v1] = new EdgeNode(new_vertex, m_edges[id_v1], length);
     m_numEdges++;
 }
 
@@ -149,7 +150,7 @@ void GraphAdjList::removeEdge(int id_v1, int id_v2)
     while (edge != nullptr)
     {
         // Se a aresta existe, remove
-        if (edge->otherVertex().getId() == id_v2)
+        if (edge->otherVertex()->getId() == id_v2)
         {
             if (prev == nullptr) m_edges[id_v1] = edge->getNext();
             else prev->setNext(edge->getNext());
@@ -171,14 +172,14 @@ EdgeNode* GraphAdjList::getEdges(int id) { return m_edges[id]; }
 
 
 // Adiciona um vértice no meio de uma aresta (v1 -> v2) e retorna o vértice adicionado
-Vertex GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
+Vertex* GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
 {
     // Percorre todos os nós da lista de adjacência
     EdgeNode* edge = m_edges[id_v1];
     while (edge != nullptr)
     {
         // Se a aresta já existe, quebra o loop
-        if (edge->otherVertex().getId() == id_v2) break;
+        if (edge->otherVertex()->getId() == id_v2) break;
         edge = edge->getNext();
     }
 
@@ -186,7 +187,7 @@ Vertex GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
     if (edge == nullptr)
     {
         cout << "Aresta " << id_v1 << " -> " << id_v2 << " não existe" << endl;
-        return Vertex(-1);
+        return nullptr;
     }
 
     float length = edge->getLength();
@@ -205,14 +206,13 @@ Vertex GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
     
     addEdge(m_numRealVertices, id_v1, distance);
     addEdge(id_v2, m_numRealVertices++, length - distance);
-    
     // Retorna o vértice adicionado
     for (EdgeNode* edges = m_edges[id_v1]; edges != nullptr; edges = edges->getNext())
     {
-        if (edges->otherVertex().getId() == m_numRealVertices - 1) return edges->otherVertex();
+        if (edges->otherVertex()->getId() == m_numRealVertices - 1) return edges->otherVertex();
     }
 
-    return Vertex(-1);
+    return nullptr;
 }
 
 // Adiciona um produto ao grafo
@@ -293,7 +293,7 @@ void GraphAdjList::print()
         for (EdgeNode* edge = m_edges[i]; edge != nullptr; edge = edge->getNext())
         {
             // Imprime a aresta (i -> edge->otherVertex())
-            cout << i + 1 << " -> " << edge->otherVertex().getId() + 1 << " (" << edge->getLength() << ") ";
+            cout << i + 1 << " -> " << edge->otherVertex()->getId() + 1 << " (" << edge->getLength() << ") ";
         }
         cout << endl;
     }

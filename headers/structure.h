@@ -14,10 +14,10 @@ class Vertex
 {
 private:
     int id;
-    vector<Client> clients;
-    vector<DeliveryPerson> deliveryPeople;
-    vector<DistributionCenter> distributionCenters;
-    vector<Seller> sellers;
+    Client* client;
+    DeliveryPerson* deliveryPerson;
+    DistributionCenter* distributionCenter;
+    Seller* seller;
 
 public:
     Vertex(int id); // Construtor
@@ -26,23 +26,23 @@ public:
     void addDeliveryPerson(const DeliveryPerson& deliveryPerson); // Adiciona um entregador
     void addDistributionCenter(const DistributionCenter& distributionCenter); // Adiciona um centro de distribuição
     void addSeller(const Seller& seller); // Adiciona um vendedor
-    vector<Client> getClients(); // Retorna a lista de clientes
-    vector<DeliveryPerson> getDeliveryPeople(); // Retorna a lista de entregadores
-    vector<DistributionCenter> getDistributionCenters(); // Retorna a lista de centros de distribuição
-    vector<Seller> getSellers(); // Retorna a lista de vendedores
+    Client* getClient(); // Retorna o cliente
+    DeliveryPerson* getDeliveryPerson(); // Retorna o entregador
+    DistributionCenter* getDistributionCenter(); // Retorna o centro de distribuição
+    Seller* getSeller(); // Retorna o vendedor
 };
 
 /* EdgeNode Header*/
 class EdgeNode
 {
 private:
-    Vertex m_otherVertex;
+    Vertex* m_otherVertex;
     EdgeNode* m_next;
     float m_length;
 
 public:
-    EdgeNode(Vertex m_otherVertex, EdgeNode* m_next, float m_length); // Construtor
-    Vertex otherVertex();           // Retorna o vértice de destino
+    EdgeNode(Vertex* m_otherVertex, EdgeNode* m_next, float m_length); // Construtor
+    Vertex* otherVertex();           // Retorna o vértice de destino
     EdgeNode* getNext();            // Retorna o próximo nó
     float getLength();                // Retorna o comprimento da aresta
     void setNext(EdgeNode* next);   // Atribui o próximo nó
@@ -65,7 +65,7 @@ public:
     GraphAdjList(int numRealVertices, int numEntities = 0); // Construtor
     ~GraphAdjList();                                    // Destrutor
     
-    Vertex getVertex(int id);                         // Retorna um vértice
+    Vertex* getVertex(int id);                         // Retorna um vértice
     int getNumVertices();                             // Retorna o número de vértices
     int getNumRealVertices();                         // Retorna o número de vértices reais
     
@@ -74,7 +74,7 @@ public:
     EdgeNode* getEdges(int id);                           // Retorna as arestas de um vértice
     int getNumEdges();                                    // Retorna o número de arestas
     
-    Vertex addVertex(int id_v1, int id_v2, float distance); // Adiciona um vértice no meio de uma aresta e retorna o vértice adicionado
+    Vertex* addVertex(int id_v1, int id_v2, float distance); // Adiciona um vértice no meio de uma aresta e retorna o vértice adicionado
 
     void addProduct(const Product& product);          // Adiciona um produto
     Product getProduct(const int& productId);         // Pega um produto

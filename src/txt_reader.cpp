@@ -79,8 +79,8 @@ void readSeller(GraphAdjList& g, stringstream& iss)
     vertex1--; vertex2--;
 
     // Adiciona o vértice do vendedor
-    Vertex adress = g.addVertex(vertex1, vertex2, distance);
-    Seller s(id, adress.getId());
+    Vertex* adress = g.addVertex(vertex1, vertex2, distance);
+    Seller s(id, adress->getId());
 
     // Adiciona os produtos ao vendedor
     for (int i = 0; i < numProducts; i++)
@@ -90,7 +90,7 @@ void readSeller(GraphAdjList& g, stringstream& iss)
         s.addProduct(g.getProduct(idProduct));
     }
 
-    adress.addSeller(s);
+    adress->addSeller(s);
     g.addSeller(s);
 }
 
@@ -106,8 +106,8 @@ void readDeliveryPerson(GraphAdjList& g, stringstream& iss)
     vertex1--; vertex2--;
 
     // Adiciona o vértice do entregador
-    g.addVertex(vertex1, vertex2, distance);
-    g.getVertex(g.getNumRealVertices()-1).addDeliveryPerson(d);
+    Vertex* adress = g.addVertex(vertex1, vertex2, distance);
+    adress->addDeliveryPerson(d);
 }
 
 
@@ -130,8 +130,8 @@ void readDistributionCenter(GraphAdjList& g, stringstream& iss)
     }
 
     // Adiciona o vértice do centro de distribuição
-    g.addVertex(vertex1, vertex2, distance);
-    g.getVertex(g.getNumRealVertices()-1).addDistributionCenter(dc);
+    Vertex* adress = g.addVertex(vertex1, vertex2, distance);
+    adress->addDistributionCenter(dc);
 }
 
 
@@ -145,9 +145,9 @@ void readClient(GraphAdjList& g, stringstream& iss)
     vertex1--; vertex2--;
 
     // Adiciona o vértice do cliente
-    Vertex adress = g.addVertex(vertex1, vertex2, distance);
-    Client c(id, adress.getId());
-    adress.addClient(c);
+    Vertex* adress = g.addVertex(vertex1, vertex2, distance);
+    Client c(id, adress->getId());
+    adress->addClient(c);
     g.add_or_upClient(c);
 }
 

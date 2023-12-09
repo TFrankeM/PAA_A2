@@ -124,13 +124,13 @@ void escolhaOperacoes(GraphAdjList graph)
             Order order = orders[0];
 
             cout << "O pedido " << order.getId() << " do cliente " << client.getId() << " tem como origem o vértice " << order.getSellerAddress() << " e como destino o vértice " << order.getClientAddress() << endl;
-            vector<pair<DeliveryPerson, int>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 3);
+            vector<pair<DeliveryPerson, float>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 5);
 
             // Imprime os entregadores mais próximos
             cout << "Os entregadores mais próximos são: " << endl;
             for (int i = 0; i < DeliveryPeople.size(); i++)
             {
-                cout << "Entregador " << i+1 << ": " << DeliveryPeople[i].first.getId() << " com distância " << DeliveryPeople[i].second << endl;
+                cout << "Entregador " << DeliveryPeople[i].first.getId() << " com distância " << DeliveryPeople[i].second << endl;
             }
         }
         case 2:
