@@ -21,6 +21,18 @@ vector<Order> Client::getOrders() const {
     return orders;
 }
 
+// Retorna um pedido específico do cliente
+Order Client::getOrder(const int& orderId) const {
+    for (int i = 0; i < orders.size(); i++)
+    {
+        if (orders[i].getId() == orderId)
+        {
+            return orders[i];
+        }
+    }
+    throw "Pedido não encontrado";
+}
+
 // Retorna o endereço do cliente
 int Client::getAddress() const {
     return address;

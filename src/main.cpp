@@ -101,6 +101,36 @@ void menuOperacoes()
          << "==> Sugerir entregas adicionais com base em uma rota \n" << endl; 
 }
 
+Order getOrder(GraphAdjList graph)
+{
+    cout << "Os clientes disponíveis são: ";
+    for (int i = 0; i < graph.getClients().size(); i++)
+    {
+        cout << graph.getClients()[i].getId() << " ";
+    }
+    cout << endl << "Escolha um cliente para verificar seus pedidos: ";
+    int client_id;
+    cin >> client_id;
+    Client client = graph.getClient(client_id);
+
+    cout << endl << "O cliente " << client.getId() << " tem " << client.getOrders().size() << " pedidos: ";
+    for (int i = 0; i < client.getOrders().size(); i++)
+    {
+        cout << client.getOrders()[i].getId() << " ";
+    }
+    cout << endl;
+
+    cout << "Qual pedido você deseja verificar? (Digite o ID do pedido) ";
+    int order_id;
+    cin >> order_id;
+
+    Order order = client.getOrder(order_id);
+
+    cout << endl << "O pedido " << order.getId() << " do cliente " << client.getId() << " tem como origem o vértice " << order.getSellerAddress() << " e como destino o vértice " << order.getClientAddress() << endl;
+
+    return order;
+}
+
 void escolhaOperacoes(GraphAdjList graph)
 {
     int escolha = 0;
@@ -114,11 +144,7 @@ void escolhaOperacoes(GraphAdjList graph)
         case 1:
         {
             // operação 1
-            Client client = graph.getClient(1);
-            vector<Order> orders = client.getOrders();
-            Order order = orders[0];
-
-            cout << "O pedido " << order.getId() << " do cliente " << client.getId() << " tem como origem o vértice " << order.getSellerAddress() << " e como destino o vértice " << order.getClientAddress() << endl;
+            Order order = getOrder(graph);
             vector<pair<DeliveryPerson, float>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 5);
 
             // Imprime os entregadores mais próximos
@@ -127,11 +153,31 @@ void escolhaOperacoes(GraphAdjList graph)
             {
                 cout << "Entregador " << DeliveryPeople[i].first.getId() << " com distância " << DeliveryPeople[i].second << endl;
             }
+            break;
         }
         case 2:
         {
-            cout << "Excelente opção!!!" << endl; 
             // operação 2
+            Order order = getOrder(graph);
+            cout << "Entregadores disponíveis: ";
+            for (int i = 0; i < graph.getDeliveryPeople().size(); i++)
+            {
+                cout << graph.getDeliveryPeople()[i].getId() << " ";
+            }
+            cout << endl << "Escolha um entregador para realizar a entrega: ";
+            int deliveryPerson_id;
+            cin >> deliveryPerson_id;
+
+            DeliveryPerson deliveryPerson = graph.getDeliveryPerson(deliveryPerson_id);
+
+            vector<EdgeNode*> path = graphOp.defineSimpleDeliveryRoute(graph, order, deliveryPerson);
+
+            cout << "A rota mais curta para o entregador " << deliveryPerson.getId() << " é: " << endl;
+            for (int i = 0; i < path.size(); i++)
+            {
+                cout << path[i]->otherVertex()->getId() << " ";
+            }
+            
             break;
         }
         case 3:

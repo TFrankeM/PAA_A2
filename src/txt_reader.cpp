@@ -108,6 +108,7 @@ void readDeliveryPerson(GraphAdjList& g, stringstream& iss)
     // Adiciona o vértice do entregador
     Vertex* adress = g.addVertex(vertex1, vertex2, distance);
     adress->addDeliveryPerson(d);
+    g.addDeliveryPerson(d);
 }
 
 

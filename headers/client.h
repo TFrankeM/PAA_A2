@@ -19,6 +19,7 @@ public:
     int getId() const;                      // Pegar ID do usuário
     void addOrder(const Order& order);      // Adicionar novo pedido do usuário
     vector<Order> getOrders() const;        // Pegar lista de pedidos do usuário
+    Order getOrder(const int& orderId) const;   // Pegar pedido específico do usuário
     int getAddress() const;                 // Pegar endereço do usuário
 };
 

@@ -244,10 +244,10 @@ void GraphAdjList::add_or_upClient(const Client& client)
     auto it = find_if(m_clients.begin(), m_clients.end(), [&client](const Client& c) { return c.getId() == client.getId(); });
     
     // Se o cliente já existe, atualiza
-    if (it != m_clients.end()) *it = client;
+    if (it != m_clients.end()) *it = client; 
 
-    // Adiciona o cliente ao grafo
-    m_clients.push_back(client);
+    // Adiciona o cliente ao grafo caso não exista
+    else m_clients.push_back(client);
 }
 
 // Pega um cliente do grafo
@@ -260,6 +260,9 @@ Client GraphAdjList::getClient(const int& clientId)
     // Retorna o cliente
     return *it;
 }
+
+// Pega todos os clientes do grafo
+vector<Client> GraphAdjList::getClients() { return m_clients; }
 
 // Adiciona um vendendor ao grafo
 void GraphAdjList::addSeller(const Seller& seller)
@@ -283,6 +286,30 @@ Seller GraphAdjList::getSeller(const int& sellerId)
     return *it;
 }
 
+// Adiciona um entregador ao grafo
+void GraphAdjList::addDeliveryPerson(const DeliveryPerson& deliveryPerson)
+{
+    // Verifica se o entregador já existe
+    auto it = find_if(m_deliveryPeople.begin(), m_deliveryPeople.end(), [&deliveryPerson](const DeliveryPerson& d) { return d.getId() == deliveryPerson.getId(); });
+    if (it != m_deliveryPeople.end()) throw runtime_error("Entregador já existe");
+
+    // Adiciona o entregador ao grafo
+    m_deliveryPeople.push_back(deliveryPerson);
+}
+
+// Pega um entregador do grafo
+DeliveryPerson GraphAdjList::getDeliveryPerson(const int& deliveryPersonId)
+{
+    // Verifica se o entregador existe
+    auto it = find_if(m_deliveryPeople.begin(), m_deliveryPeople.end(), [&deliveryPersonId](const DeliveryPerson& d) { return d.getId() == deliveryPersonId; });
+    if (it == m_deliveryPeople.end()) throw runtime_error("Entregador com ID " + to_string(deliveryPersonId) + " não existe");
+
+    // Retorna o entregador
+    return *it;
+}
+
+// Pega todos os entregadores do grafo
+vector<DeliveryPerson> GraphAdjList::getDeliveryPeople() { return m_deliveryPeople; }
 
 // Imprime o grafo
 void GraphAdjList::print()

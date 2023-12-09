@@ -59,6 +59,7 @@ private:
     vector<Product> m_products;
     vector<Client> m_clients;
     vector<Seller> m_sellers;
+    vector<DeliveryPerson> m_deliveryPeople;
     EdgeNode** m_edges;
 
 public:
@@ -84,6 +85,11 @@ public:
     
     void add_or_upClient(const Client& client);       // Adiciona ou atualiza um cliente
     Client getClient(const int& clientId);            // Pega um cliente
+    vector<Client> getClients();                      // Pega todos os clientes
+    
+    void addDeliveryPerson(const DeliveryPerson& deliveryPerson); // Adiciona um entregador
+    DeliveryPerson getDeliveryPerson(const int& deliveryPersonId); // Pega um entregador
+    vector<DeliveryPerson> getDeliveryPeople();       // Pega todos os entregadores
     
     void print();                                     // Imprime o grafo
 };
