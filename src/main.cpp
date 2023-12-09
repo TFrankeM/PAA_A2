@@ -14,30 +14,30 @@ void menuPrincipal()
     cout << "Digite o número correspondente a um cenário de funcionamento do aplicativo:\n" << endl;
 
     cout << "Cenário 1: \n"
-            << "i vértices \n"
-            << "j arestas \n"
-            << "k clientes \n" 
-            << "l entregadores \n"
-            << "m vendedores \n"
-            << "n centrais de distribuição \n" 
+            << "24 vértices \n"
+            << "38 arestas \n"
+            << "1 clientes \n" 
+            << "6 entregadores \n"
+            << "1 vendedores \n"
+            << "- centrais de distribuição \n" 
             << endl;
 
     cout << "Cenário 2: \n"
-            << "i vértices \n"
-            << "j arestas \n"
-            << "k clientes \n" 
-            << "l entregadores \n"
-            << "m vendedores \n"
-            << "n centrais de distribuição \n" 
+            << "20 vértices \n"
+            << "39 arestas \n"
+            << "- clientes \n" 
+            << "4 entregadores \n"
+            << "1 vendedores \n"
+            << "- centrais de distribuição \n" 
             << endl;
     
     cout << "Cenário 3: \n"
-            << "i vértices \n"
-            << "j arestas \n"
-            << "k clientes \n" 
-            << "l entregadores \n"
-            << "m vendedores \n"
-            << "n centrais de distribuição \n" 
+            << "20 vértices \n"
+            << "31 arestas \n"
+            << "- clientes \n" 
+            << "6 entregadores \n"
+            << "1 vendedores \n"
+            << "- centrais de distribuição \n" 
             << endl;
 
     cout << "Para sair do aplicativo digite 4\n" << endl;
@@ -51,25 +51,22 @@ GraphAdjList menuOpcoes()
 {
     int escolha = 0;
     cout << " ==> Digite a sua escolha [1, 2, 3 ou 4]: ";
-    // cin >> escolha;
+    cin >> escolha;
 
     escolha = 1;
 
     switch (escolha) {
         case 1:
-        {
-            cout << "Excelente opção!!!" << endl; 
-            return readFile("./graph_maps/op1/Caso de teste 1.txt");
+        { 
+            return readFile("./graph_maps/op1/Caso_de_teste_1.txt");
         }
         case 2:
         {
-            cout << "Excelente opção!!!" << endl; 
-            // Criar o grafo da cidade com a opção 1
+            return readFile("./graph_maps/op1/Caso_de_teste_2.txt");
         }
         case 3:
         {
-            cout << "Excelente opção!!!" << endl; 
-            // Criar o grafo da cidade com a opção 1
+            return readFile("./graph_maps/op1/Caso_de_teste_3.txt");
         }
         case 4:
         {   
@@ -108,7 +105,7 @@ void escolhaOperacoes(GraphAdjList graph)
 {
     int escolha = 0;
     cout << " ==> Digite a sua escolha [1, 2, 3 ou 4]: ";
-    //cin >> escolha;
+    cin >> escolha;
     GraphOperations graphOp;
 
     escolha = 1;
@@ -116,8 +113,6 @@ void escolhaOperacoes(GraphAdjList graph)
     switch (escolha) {
         case 1:
         {
-            cout << "Excelente opção!!!" << endl; 
-
             // operação 1
             Client client = graph.getClient(1);
             vector<Order> orders = client.getOrders();
@@ -161,18 +156,6 @@ void escolhaOperacoes(GraphAdjList graph)
 
 int main()
 {
-    // GraphAdjList g(6);
-    // g.addEdge(0, 1, 2);
-    // g.addEdge(0, 2, 1);
-    // g.addEdge(1, 3, 3);
-    // g.addEdge(1, 4, 2);
-    // g.addEdge(2, 4, 4);
-    // g.addEdge(3, 4, 1);
-    // g.addEdge(4, 5, 2);
-    // g.addEdge(4, 1, 1);
-    // g.print();
-
-
     while(true) 
     {
         menuPrincipal();
@@ -182,8 +165,7 @@ int main()
         while(true)
         {
             GraphAdjList graph = menuOpcoes();
-        
-            // Sleep
+            cout << "Arquivo lido com sucesso!" << endl;
             sleep(1);
 
             if(escolha == 1 || escolha == 2 || escolha == 3 || escolha == 4) { break; }
@@ -192,6 +174,7 @@ int main()
 
             menuOperacoes();
             escolhaOperacoes(graph);
+
             sleep(1);
         }
         
