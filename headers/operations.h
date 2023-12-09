@@ -11,6 +11,26 @@
 
 using namespace std;
 
+
+
+struct Route {
+    int id;
+    Order order;
+    vector<EdgeNode*> route;
+    DeliveryPerson deliveryPerson;
+    DistributionCenter distributionCenter;
+
+    // Construtor
+    Route(const int id, const Order& order, const vector<EdgeNode*>& route, DeliveryPerson deliveryPerson, DistributionCenter distributionCenter);
+
+    // Métodos
+    int getId() const;
+    void changeRoute(const vector<EdgeNode*>& newRoute);
+    const Order& getOrder() const;
+    const DistributionCenter& getDistributionCenter() const;
+    const DeliveryPerson& getDeliveryPerson() const;
+};
+
 // Classe GraphOperations para realizar operações no grafo
 class GraphOperations {
 public:
@@ -32,6 +52,15 @@ public:
                                         vector<DistributionCenter>& distributionCenters, 
                                         Order order, 
                                         int numDeliveryPeople);
+
+    // Sugere entregas adicionais
+    vector<Order> findOrdersSugest(GraphAdjList& graph, Route& route); 
+
+    // funcao auxiliar para encontrar o faturamento maximo de um conjunto de orders
+    static vector<Order> getMaxPriceOrdersLimitedByCenter(Vertex& vertex, double weightLimit, DistributionCenter& distributionCenter);
+
+    // funcao auxiliar que calcula o peso e preco total de varias orders
+    std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orders);
 };
 
 #endif
