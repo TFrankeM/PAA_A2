@@ -107,7 +107,10 @@ Vertex GraphAdjList::getVertex(int id)
     // Retorna o vértice
     for (int i = 0; i < m_numVertices; i++)
     {
-        if (m_edges[i]->otherVertex().getId() == id) return m_edges[i]->otherVertex();
+        for (EdgeNode* edge = m_edges[i]; edge != nullptr; edge = edge->getNext())
+        {
+            if (edge->otherVertex().getId() == id) return edge->otherVertex();
+        }
     }
 
     throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
@@ -167,8 +170,8 @@ EdgeNode* GraphAdjList::getEdges(int id) { return m_edges[id]; }
 
 
 
-// Adiciona um vértice no meio de uma aresta (v1 -> v2)
-void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
+// Adiciona um vértice no meio de uma aresta (v1 -> v2) e retorna o vértice adicionado
+Vertex GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
 {
     // Percorre todos os nós da lista de adjacência
     EdgeNode* edge = m_edges[id_v1];
@@ -180,16 +183,21 @@ void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
     }
 
     // Caso a aresta não exista, retorna
-    if (edge == nullptr) return;
+    if (edge == nullptr)
+    {
+        cout << "Aresta " << id_v1 << " -> " << id_v2 << " não existe" << endl;
+        return Vertex(-1);
+    }
 
     float length = edge->getLength();
     
     // Caso a distância não seja menor que a distância da aresta, retorna
-    if (distance > length){ 
+    if (distance > length)
+    { 
         cout << "Distância: " << distance << " | Comprimento da aresta: " << length << endl; // "Distância maior que a distância da aresta
         cout << "Vértice 1: " << id_v1 << " | Vértice 2: " << id_v2 << endl;
         throw runtime_error("Distância maior que a distância da aresta"); 
-        }
+    }
 
     // Adiciona o vértice no meio da aresta
     addEdge(id_v1, m_numRealVertices , distance);
@@ -197,6 +205,14 @@ void GraphAdjList::addVertex(int id_v1, int id_v2, float distance)
     
     addEdge(m_numRealVertices, id_v1, distance);
     addEdge(id_v2, m_numRealVertices++, length - distance);
+    
+    // Retorna o vértice adicionado
+    for (EdgeNode* edges = m_edges[id_v1]; edges != nullptr; edges = edges->getNext())
+    {
+        if (edges->otherVertex().getId() == m_numRealVertices - 1) return edges->otherVertex();
+    }
+
+    return Vertex(-1);
 }
 
 // Adiciona um produto ao grafo
@@ -221,12 +237,14 @@ Product GraphAdjList::getProduct(const int& productId)
     return *it;
 }
 
-// Adiciona um cliente ao grafo
-void GraphAdjList::addClient(const Client& client)
+// Adiciona ou atualiza um cliente do grafo
+void GraphAdjList::add_or_upClient(const Client& client)
 {
     // Verifica se o cliente já existe
     auto it = find_if(m_clients.begin(), m_clients.end(), [&client](const Client& c) { return c.getId() == client.getId(); });
-    if (it != m_clients.end()) throw runtime_error("Cliente já existe");
+    
+    // Se o cliente já existe, atualiza
+    if (it != m_clients.end()) *it = client;
 
     // Adiciona o cliente ao grafo
     m_clients.push_back(client);

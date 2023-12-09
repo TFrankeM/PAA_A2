@@ -74,7 +74,7 @@ public:
     EdgeNode* getEdges(int id);                           // Retorna as arestas de um vértice
     int getNumEdges();                                    // Retorna o número de arestas
     
-    void addVertex(int id_v1, int id_v2, float distance); // Adiciona um vértice no meio de uma aresta
+    Vertex addVertex(int id_v1, int id_v2, float distance); // Adiciona um vértice no meio de uma aresta e retorna o vértice adicionado
 
     void addProduct(const Product& product);          // Adiciona um produto
     Product getProduct(const int& productId);         // Pega um produto
@@ -82,7 +82,7 @@ public:
     void addSeller(const Seller& seller);             // Adiciona um vendedor
     Seller getSeller(const int& sellerId);            // Pega um vendedor
     
-    void addClient(const Client& client);             // Adiciona um cliente
+    void add_or_upClient(const Client& client);       // Adiciona ou atualiza um cliente
     Client getClient(const int& clientId);            // Pega um cliente
     
     void print();                                     // Imprime o grafo

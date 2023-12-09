@@ -13,14 +13,13 @@ private:
 
 public:
     // Construtor
-    Client(const int& clientId);
+    Client(const int& clientId, const int& clientAddress);
 
     // Métodos de acesso
     int getId() const;                      // Pegar ID do usuário
     void addOrder(const Order& order);      // Adicionar novo pedido do usuário
     vector<Order> getOrders() const;        // Pegar lista de pedidos do usuário
     int getAddress() const;                 // Pegar endereço do usuário
-    void setAddress(const int& address);    // Atribuir endereço do usuário
 };
 
 #endif

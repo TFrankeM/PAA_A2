@@ -1,0 +1,65 @@
+#vértices 20
+#vendedores 1
+#entregadores 0
+
+vértice 1 1.0 2.0
+vértice 2 5.0 1.0
+vértice 3 7.0 4.0
+vértice 4 10.0 2.0
+vértice 5 15.0 1.0
+vértice 6 17.0 3.0
+vértice 7 20.0 5.0
+vértice 8 3.0 6.0
+vértice 9 7.0 8.0
+vértice 10 11.0 7.0
+vértice 11 16.0 6.0
+vértice 12 20.0 9.0
+vértice 13 2.0 11.0
+vértice 14 5.0 12.0
+vértice 15 8.0 14.0
+vértice 16 12.0 12.0
+vértice 17 17.0 11.0
+vértice 18 19.0 13.0
+vértice 19 22.0 15.0
+vértice 20 24.0 18.0
+
+aresta 1 2
+aresta 2 3
+aresta 3 4
+aresta 4 5
+aresta 5 6
+aresta 6 7
+aresta 1 8
+aresta 2 9
+aresta 3 10
+aresta 4 11
+aresta 5 12
+aresta 7 20
+aresta 8 13
+aresta 15 14
+aresta 8 9
+aresta 9 10
+aresta 10 11
+aresta 11 12
+aresta 12 7
+aresta 13 14
+aresta 8 15
+aresta 9 16
+aresta 10 17
+aresta 11 18
+aresta 12 19
+aresta 15 20
+aresta 15 16
+aresta 16 17
+aresta 17 18
+aresta 18 19
+aresta 19 20
+
+vendedor 1 17 10 2
+
+entregador 1 7 20 3
+entregador 2 20 15 10
+entregador 3 4 5 2
+entregador 4 10 17 1
+entregador 5 12 19 6
+entregador 6 8 15 7 

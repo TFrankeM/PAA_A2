@@ -3,8 +3,9 @@
 #include "../headers/seller.h"
 
 // Construtor da classe vendedor
-Seller::Seller(const int& sellerId)
+Seller::Seller(const int& sellerId, const int& sellerAddress)
     : id(sellerId)
+    , address(sellerAddress)
 {}
 
 // Retorna o ID do vendedor
@@ -52,6 +53,3 @@ Product Seller::getProduct(const int& productId) const
 
 // Retorna o endereço do vendedor
 int Seller::getAddress() const { return address; }
-
-// Atribui o endereço do vendedor
-void Seller::setAddress(const int& address) { this->address = address; }
