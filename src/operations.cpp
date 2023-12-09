@@ -389,3 +389,133 @@ void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, 
         - A sua disponibilidade no inventário.
 */
 
+
+
+std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orders) {
+    double totalPrice = 0.0;
+    double totalWeight = 0.0;
+
+    for (const Order& order : orders) {
+        totalPrice += order.getProduct().getPrice();
+        totalWeight += order.getProduct().getWeight();
+    }
+
+    return std::make_pair(totalPrice, totalWeight);
+}
+
+
+
+
+vector<Order> GraphOperations::getMaxPriceOrdersLimitedByCenter(Vertex& vertex, double weightLimit, DistributionCenter& distributionCenter) {
+        vector<Order> orders = vertex.getCrescentePriceOrders();
+
+        vector<Order> bestCombo;
+        double bestPrice = 0.0;
+
+        // Calcula todas as combinações possíveis
+        int n = orders.size();
+        for (int i = 0; i < (1 << n); ++i) {
+
+            vector<Order> currentCombo;
+            double currentWeight = 0.0, currentPrice = 0.0;
+
+            for (int j = 0; j < n; ++j) {
+                if (i & (1 << j)) {
+                    Product product = orders[j].getProduct();
+                    currentWeight += product.getWeight();
+                    currentPrice += product.getPrice();
+                    bool productAvalible = distributionCenter.isProductAvailable(product.getId());
+
+                    if (currentWeight <= weightLimit && productAvalible) {
+                        currentCombo.push_back(orders[j]);
+                    } else {
+                        // Se o peso exceder o limite, descarte esta combinação
+                        break;
+                    }
+                }
+            }
+
+            if (currentWeight <= weightLimit && currentPrice > bestPrice) {
+                bestCombo = currentCombo;
+                bestPrice = currentPrice;
+            }
+        }
+
+        return bestCombo;
+}
+
+
+
+vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& route) {
+    
+
+    Order order = route.getOrder();
+    int startVertexId = order.getClientAddress();
+    DeliveryPerson deliveryperson= route.getDeliveryPerson();
+    DistributionCenter distributionCenter= route.getDistributionCenter();
+
+    MinHeap heap;
+    
+    double capacityAvailableDelivery = deliveryperson.getCurrentCapacityAvailable();
+    vector<int> distances(graph.getNumVertices(), INT_MAX);
+    vector<bool> visited(graph.getNumVertices(), false);
+    vector<vector<Order>> orders(graph.getNumVertices()); // Inicializa um vetor de vetores de Order
+    vector<double> totalrevenue(graph.getNumVertices(), 0.0); // Inicializa com zero
+
+    vector<Order> bestOrders;
+    double bestValue = 0.0;
+    double lowestCost = std::numeric_limits<double>::max();
+
+    distances[startVertexId] = 0;
+    heap.push({distances[startVertexId], startVertexId});
+
+
+    while (!heap.empty()) {
+        
+        int currentVertexId = heap.top().second; // Vertice com valor minimo
+        heap.pop(); // Remove Verice do Heap
+
+        if (distances[currentVertexId] == INT_MAX) { break; }
+
+        if (visited[currentVertexId]) continue;
+        visited[currentVertexId] = true;
+
+
+        EdgeNode* edge = graph.getEdges(currentVertexId);
+
+
+        while(edge){
+            Vertex neighborVertex = edge->otherVertex();
+            int neighborVertexId = neighborVertex.getId();
+            if (!visited[neighborVertexId]) {
+                int edgeLength = edge->getLength();
+
+                if(distances[currentVertexId] + edgeLength < distances[neighborVertexId]){
+
+                    vector<Order> combinedOrders = orders[currentVertexId]; // Herda as ordens do pai
+
+                    double availableCapacity = capacityAvailableDelivery - calculateTotalPriceAndWeight(combinedOrders).first;
+                    vector<Order> neighborOrders = getMaxPriceOrdersLimitedByCenter(neighborVertex,availableCapacity,distributionCenter);
+                    combinedOrders.insert(combinedOrders.end(), neighborOrders.begin(), neighborOrders.end());
+
+                    orders[neighborVertexId] = combinedOrders;
+                    distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
+
+                    // Atualiza as melhores ordens se necessário
+                    std::pair<double, double> priceAndWeight = calculateTotalPriceAndWeight(combinedOrders);
+                    if (priceAndWeight.first > bestValue || (priceAndWeight.first == bestValue && priceAndWeight.second < lowestCost)) {
+                        bestOrders = combinedOrders;
+                        bestValue = priceAndWeight.first;
+                        lowestCost = priceAndWeight.second;
+                    }
+
+                    heap.push({distances[neighborVertexId], neighborVertexId});
+                }
+            }
+            edge = edge->getNext();
+        }
+    }
+
+    return bestOrders;
+}
+
