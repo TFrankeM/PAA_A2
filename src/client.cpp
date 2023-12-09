@@ -20,3 +20,12 @@ vector<Order> Client::getOrders() const {
     return orders;
 }
 
+// Retorna o endereço do cliente
+int Client::getAddress() const {
+    return address;
+}
+
+// Atribui o endereço do cliente
+void Client::setAddress(const int& address) {
+    this->address = address;
+}

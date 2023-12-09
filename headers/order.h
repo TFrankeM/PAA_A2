@@ -33,6 +33,8 @@ public:
     OrderType getType() const;      // Pega o tipo do pedido
     int getSellerAddress() const;   // Pega o endereço do vendedor
     int getClientAddress() const;   // Pega o endereço do cliente
+    void setSellerAddress(int address); // Define o endereço do vendedor
+    void setClientAddress(int address); // Define o endereço do cliente
 };
 
 #endif

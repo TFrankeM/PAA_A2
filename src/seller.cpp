@@ -49,3 +49,9 @@ Product Seller::getProduct(const int& productId) const
     throw runtime_error("Product not found");
 }
 
+
+// Retorna o endereço do vendedor
+int Seller::getAddress() const { return address; }
+
+// Atribui o endereço do vendedor
+void Seller::setAddress(const int& address) { this->address = address; }

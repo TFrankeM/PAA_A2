@@ -27,3 +27,6 @@ int Order::getSellerAddress() const { return sellerAddress; }
 // Retorna o endereço do cliente
 int Order::getClientAddress() const { return clientAddress; }
 
+void Order::setSellerAddress(int address) { sellerAddress = address; }
+
+void Order::setClientAddress(int address) { clientAddress = address; }

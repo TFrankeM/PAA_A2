@@ -1,5 +1,8 @@
 #include <iostream>
 #include "../headers/structure.h"
+#include "../headers/txt_reader.h"
+#include "../headers/operations.h"
+#include <unistd.h>
 
 using namespace std;
 
@@ -45,43 +48,42 @@ void menuPrincipal()
     cout << "Digite o número correspondente a um cenário de funcionamento do aplicativo.\n" << endl;
 }
 
-int menuOpcoes()
+GraphAdjList menuOpcoes()
 {
     int escolha = 0;
     cout << " ==> Digite a sua escolha [1, 2, 3 ou 4]: ";
-    cin >> escolha;
+    // cin >> escolha;
+
+    escolha = 1;
 
     switch (escolha) {
         case 1:
         {
             cout << "Excelente opção!!!" << endl; 
-            // Criar o grafo da cidade com a opção 1
-            return escolha;
+            return readFile("Caso de teste 1.txt");
         }
         case 2:
         {
             cout << "Excelente opção!!!" << endl; 
             // Criar o grafo da cidade com a opção 1
-            return escolha;
         }
         case 3:
         {
             cout << "Excelente opção!!!" << endl; 
             // Criar o grafo da cidade com a opção 1
-            return escolha;
         }
         case 4:
         {   
             // Sai do programa
             cout << "Que pena!" << endl; 
-            return escolha;
         }
         default:
         {
             cout << "Opção inválida. Tente novamente." << endl;
-            return -1;
         }
     }
+
+    return GraphAdjList(0);
 }
 
 void menuOperacoes()
@@ -103,6 +105,58 @@ void menuOperacoes()
          << "==> Sugerir entregas adicionais com base em uma rota \n" << endl; 
 }
 
+void escolhaOperacoes(GraphAdjList graph)
+{
+    int escolha = 0;
+    cout << " ==> Digite a sua escolha [1, 2, 3 ou 4]: ";
+    // cin >> escolha;
+    GraphOperations graphOp;
+
+    escolha = 1;
+
+    switch (escolha) {
+        case 1:
+        {
+            cout << "Excelente opção!!!" << endl; 
+            // operação 1
+            Client client = graph.getClient(1);
+            cout << "O cliente é: " << client.getId();
+            Order order = client.getOrders()[0];
+            cout << "O pedido é: " << order.getId() << " - " << order.getClientAddress() << " - " << order.getSellerAddress() << endl;
+            vector<pair<int, int>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 3);
+
+            // Imprime os entregadores mais próximos
+            cout << "Os entregadores mais próximos são: " << endl;
+            for (int i = 0; i < DeliveryPeople.size(); i++)
+            {
+                cout << "Entregador " << i+1 << ": " << DeliveryPeople[i].first << " - " << DeliveryPeople[i].second << endl;
+            }
+        }
+        case 2:
+        {
+            cout << "Excelente opção!!!" << endl; 
+            // operação 2
+            break;
+        }
+        case 3:
+        {
+            cout << "Excelente opção!!!" << endl; 
+            // operação 3
+            break;
+        }
+        case 4:
+        {
+            cout << "Excelente opção!!!" << endl; 
+            // operação 4
+            break;
+        }
+        default:
+        {
+            cout << "Opção inválida. Tente novamente." << endl;
+            break;
+        }
+    }
+}
 
 int main()
 {
@@ -117,6 +171,7 @@ int main()
     // g.addEdge(4, 1, 1);
     // g.print();
 
+
     while(true) 
     {
         menuPrincipal();
@@ -125,14 +180,21 @@ int main()
 
         while(true)
         {
-            escolha = menuOpcoes();
+            GraphAdjList graph = menuOpcoes();
+        
+            // Sleep
+            sleep(1);
 
             if(escolha == 1 || escolha == 2 || escolha == 3 || escolha == 4) { break; }
+
+            if(escolha == 4) { break; }
+
+            menuOperacoes();
+            escolhaOperacoes(graph);
+            sleep(1);
         }
         
-        if(escolha == 4) { break; }
-
-        menuOperacoes();
+        
     }
 }
 
