@@ -138,14 +138,12 @@ void escolhaOperacoes(GraphAdjList graph)
     cin >> escolha;
     GraphOperations graphOp;
 
-    escolha = 1;
-
     switch (escolha) {
         case 1:
         {
             // operação 1
             Order order = getOrder(graph);
-            vector<pair<DeliveryPerson, float>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 5);
+            vector<pair<DeliveryPerson, float>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 2);
 
             // Imprime os entregadores mais próximos
             cout << "Os entregadores mais próximos são: " << endl;
@@ -159,6 +157,7 @@ void escolhaOperacoes(GraphAdjList graph)
         {
             // operação 2
             Order order = getOrder(graph);
+    
             cout << "Entregadores disponíveis: ";
             for (int i = 0; i < graph.getDeliveryPeople().size(); i++)
             {

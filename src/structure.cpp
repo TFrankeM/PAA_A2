@@ -69,7 +69,7 @@ GraphAdjList::GraphAdjList(int numRealVertices, int numEntities)
     : m_numVertices(numRealVertices + numEntities)
     , m_numRealVertices(numRealVertices)
     , m_numEdges(0)
-    , m_edges(nullptr)
+    , m_edges()
     , m_products()
     , m_clients()
 {
@@ -104,13 +104,19 @@ Vertex* GraphAdjList::getVertex(int id)
     // Verifica se o vértice existe
     if (id < 0 || id >= m_numVertices) throw runtime_error("Vértice com ID " + to_string(id) + " não existe");
 
-    // Retorna o vértice
-    for (int i = 0; i < m_numVertices; i++)
+    // Obtém um vértice adjacente ao vértice de ID id
+    EdgeNode* edge = m_edges[id];
+
+    int id_adj = edge->otherVertex()->getId();
+    if (id_adj == 0) id_adj = edge->getNext()->otherVertex()->getId();
+    EdgeNode* adj_vertex_edge = m_edges[id_adj];
+    
+    // Percorre todos os vértices adjacentes ao nó adj_vertex_edge
+    while (adj_vertex_edge != nullptr)
     {
-        for (EdgeNode* edge = m_edges[i]; edge != nullptr; edge = edge->getNext())
-        {
-            if (edge->otherVertex()->getId() == id) return (edge->otherVertex());
-        }
+        // Se o vértice adjacente for o vértice de ID id, o vértice com ID id foi encontrado
+        if (adj_vertex_edge->otherVertex()->getId() == id) return adj_vertex_edge->otherVertex();
+        adj_vertex_edge = adj_vertex_edge->getNext();
     }
 
     throw runtime_error("Vértice com ID " + to_string(id) + " não existe");

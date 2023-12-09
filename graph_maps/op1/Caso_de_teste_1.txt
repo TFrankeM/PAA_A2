@@ -67,11 +67,11 @@ aresta 17 23
 aresta 18 24
 produto 1 3 4
 vendedor 1 3 9 0.5 1 1
-entregador 1 1 7 0.1
-entregador 2 9 15 0.5
-entregador 3 12 11 0.3
-entregador 4 18 24 0.1
-entregador 5 20 14 0.9
-entregador 6 14 15 0.7
+entregador 1 1 7 0.1 20
+entregador 2 9 15 0.5 30
+entregador 3 12 11 0.3 10
+entregador 4 18 24 0.1 15
+entregador 5 20 14 0.9 10
+entregador 6 14 15 0.7 20
 cliente 1 12 18 0
 ordem 1 1 1 Simple 1

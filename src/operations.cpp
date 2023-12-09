@@ -25,7 +25,7 @@ vector<pair<DeliveryPerson, float>> GraphOperations::findNearestDeliveryPeople(G
     int m_numVertices = graph.getNumVertices();
 
     // Lista "distancia" de tamanho |V| com valores infinito
-    vector<float> distances(m_numVertices, numeric_limits<int>::max());
+    vector<float> distances(m_numVertices, numeric_limits<float>::max());
 
     // Lista "visitado" de tamanho |V| com valores falso
     vector<bool> visited(m_numVertices, false);
@@ -57,7 +57,7 @@ vector<pair<DeliveryPerson, float>> GraphOperations::findNearestDeliveryPeople(G
         visited[currentVertex->getId()] = true;
 
         // Se a distância do vértice atual é máxima, já visitamos todos os vértices possíveis
-        if (distances[currentVertex->getId()]  == numeric_limits<int>::max()) {
+        if (distances[currentVertex->getId()]  == numeric_limits<float>::max()) {
             break;
         }
 
@@ -122,19 +122,21 @@ vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph
                                                              Order order, 
                                                              DeliveryPerson deliveryPerson) 
 {
-
     Vertex* sellerVertex = graph.getVertex(order.getSellerAddress());
     Vertex* clientVertex = graph.getVertex(order.getClientAddress());
+    
     // A lista para armazenar a rota final
     vector<EdgeNode*> route;
 
     // Primeiro, encontrar o caminho do entregador até o vendedor
     vector<Vertex*> pathToSeller = findPath(graph, graph.getVertex(deliveryPerson.getAddress()), sellerVertex);
+
     // Adiciona este caminho à rota
     addToRoute(graph, route, pathToSeller);
 
     // Depois, encontrar o caminho do vendedor até o cliente
     vector<Vertex*> pathToClient = findPath(graph, sellerVertex, clientVertex);
+    
     // Adiciona este caminho à rota
     addToRoute(graph, route, pathToClient);
 
@@ -145,7 +147,7 @@ vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph
 // Dijkstra para encontrar o menor caminho
 vector<Vertex*> GraphOperations::findPath(GraphAdjList& graph, Vertex* startVertex, Vertex* endVertex) {
     MinHeap heap;
-    vector<int> distances(graph.getNumVertices(), numeric_limits<int>::max());
+    vector<float> distances(graph.getNumVertices(), numeric_limits<int>::max());
     vector<bool> visited(graph.getNumVertices(), false);
     vector<Vertex*> parents(graph.getNumVertices(), nullptr);
 
@@ -153,14 +155,12 @@ vector<Vertex*> GraphOperations::findPath(GraphAdjList& graph, Vertex* startVert
     parents[startVertex->getId()] = startVertex;
     heap.push({distances[startVertex->getId()], startVertex});
 
-
-
-    while (!heap.empty()) {
-        
+    while (!heap.empty()) {        
         Vertex* currentVertex = heap.top().second; // Vertice com valor minimo
+        cout << "currentVertex: " << currentVertex->getId() << endl;
         heap.pop(); // Remove Verice do Heap
 
-        if (distances[currentVertex->getId()] == numeric_limits<int>::max()) { break; }
+        if (distances[currentVertex->getId()] == numeric_limits<float>::max()) { break; }
 
         if (visited[currentVertex->getId()]) continue;
         visited[currentVertex->getId()] = true;
@@ -169,14 +169,14 @@ vector<Vertex*> GraphOperations::findPath(GraphAdjList& graph, Vertex* startVert
         EdgeNode* edge = graph.getEdges(currentVertex->getId());
 
         while(edge){
-            int neighborVertexId = edge->otherVertex()->getId();
-            if (!visited[neighborVertexId]) {
-                int edgeLength = edge->getLength();
+            Vertex* neighborVertex = edge->otherVertex();
+            if (!visited[neighborVertex->getId()]) {
+                float edgeLength = edge->getLength();
 
-                if(distances[currentVertex->getId()] + edgeLength < distances[neighborVertexId]){
-                    parents[neighborVertexId] = currentVertex;
-                    distances[neighborVertexId] = distances[currentVertex->getId()] + edgeLength;
-                    heap.push({distances[neighborVertexId], edge->otherVertex()});
+                if(distances[currentVertex->getId()] + edgeLength < distances[neighborVertex->getId()]){
+                    parents[neighborVertex->getId()] = currentVertex;
+                    distances[neighborVertex->getId()] = distances[currentVertex->getId()] + edgeLength;
+                    heap.push({distances[neighborVertex->getId()], neighborVertex});
                 }
                 
             }

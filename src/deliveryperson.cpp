@@ -5,7 +5,7 @@
 // Construtor da classe entregador
 DeliveryPerson::DeliveryPerson(const int& deliveryPersonId, double maxCapacity)
     : id(deliveryPersonId)
-    , capacity(maxCapacity) 
+    , capacity(maxCapacity)
 {}
 
 // Retorna o ID do entregador
