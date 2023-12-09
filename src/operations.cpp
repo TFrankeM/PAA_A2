@@ -390,7 +390,6 @@ void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, 
 */
 
 
-
 std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orders) {
     double totalPrice = 0.0;
     double totalWeight = 0.0;
@@ -446,13 +445,13 @@ vector<Order> GraphOperations::getMaxPriceOrdersLimitedByCenter(Vertex& vertex, 
 
 
 
-vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& route) {
+vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& route){
     
 
-    Order order = route.getOrder();
+    Order order = route.getOrder();  
     int startVertexId = order.getClientAddress();
-    DeliveryPerson deliveryperson= route.getDeliveryPerson();
-    DistributionCenter distributionCenter= route.getDistributionCenter();
+    DeliveryPerson deliveryperson = route.getDeliveryPerson();  
+    DistributionCenter distributionCenter = route.getDistributionCenter();  
 
     MinHeap heap;
     
@@ -518,4 +517,3 @@ vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& rout
 
     return bestOrders;
 }
-
