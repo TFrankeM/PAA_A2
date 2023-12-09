@@ -34,7 +34,7 @@ void MinHeap::heapify(int index)
 }
 
 // Adiciona novo elemento ao heap
-void MinHeap::push(pair<int, int> element) 
+void MinHeap::push(pair<int, Vertex> element) 
 {
     heap.push_back(element);            // Adiciona elemento ao final do vetor
     int current = size++;               // Incrementa o tamanho
@@ -58,7 +58,7 @@ void MinHeap::pop()
 }
 
 // Retorna o primeiro elemento do heap (o de menor distância)
-pair<int, int> MinHeap::top() const 
+pair<int, Vertex> MinHeap::top() const 
 {
     return heap[0];
 }

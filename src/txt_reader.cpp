@@ -74,10 +74,13 @@ void readSeller(GraphAdjList& g, stringstream& iss)
 {
     int id; int vertex1; int vertex2; float distance; int numProducts;
     iss >> id >> vertex1 >> vertex2 >> distance >> numProducts;
-    Seller s(id);
 
     // Normaliza os IDs dos vértices
     vertex1--; vertex2--;
+
+    // Adiciona o vértice do vendedor
+    Vertex adress = g.addVertex(vertex1, vertex2, distance);
+    Seller s(id, adress.getId());
 
     // Adiciona os produtos ao vendedor
     for (int i = 0; i < numProducts; i++)
@@ -87,10 +90,7 @@ void readSeller(GraphAdjList& g, stringstream& iss)
         s.addProduct(g.getProduct(idProduct));
     }
 
-    // Adiciona o vértice do vendedor
-    g.addVertex(vertex1, vertex2, distance);
-    s.setAddress(g.getNumRealVertices()-1);
-    g.getVertex(g.getNumRealVertices()-1).addSeller(s);
+    adress.addSeller(s);
     g.addSeller(s);
 }
 
@@ -140,16 +140,15 @@ void readClient(GraphAdjList& g, stringstream& iss)
 {
     int id; int vertex1; int vertex2; float distance;
     iss >> id >> vertex1 >> vertex2 >> distance;
-    Client c(id);
 
     // Normaliza os IDs dos vértices
     vertex1--; vertex2--;
 
     // Adiciona o vértice do cliente
-    g.addVertex(vertex1, vertex2, distance);
-    c.setAddress(g.getNumRealVertices()-1);
-    g.getVertex(g.getNumRealVertices()-1).addClient(c);
-    g.addClient(c);
+    Vertex adress = g.addVertex(vertex1, vertex2, distance);
+    Client c(id, adress.getId());
+    adress.addClient(c);
+    g.add_or_upClient(c);
 }
 
 
@@ -164,10 +163,12 @@ void readOrder(GraphAdjList& g, stringstream& iss)
     if (s_orderType == "Simple") orderType = OrderType::Simple;
     else if (s_orderType == "Optimized") orderType = OrderType::Optimized;
 
-    Order o(id, g.getProduct(product), orderType);
-    o.setClientAddress(g.getClient(client).getAddress());
-    o.setSellerAddress(g.getSeller(seller).getAddress());
-    g.getClient(client).addOrder(o);
+    Client clientObj = g.getClient(client);
+    Seller sellerObj = g.getSeller(seller);
+    Order o(id, g.getProduct(product), orderType, sellerObj.getAddress(), clientObj.getAddress());
+    
+    clientObj.addOrder(o);
+    g.add_or_upClient(clientObj);
 }
 
 // Função que lê uma linha e chama a função correspondente

@@ -1,7 +1,8 @@
 #ifndef TXT_READER_H
 #define TXT_READER_H
 
-#include "../headers/structure.h"
+#include <iostream>
+#include "structure.h"
 
 
 void readVertex(istream& iss, int vertex_coords[][2]);

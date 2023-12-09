@@ -15,11 +15,12 @@
     - A entrada da operação deverá ser o pedido, e o resultado a lista de entregadores sugeridos.
 */
 
-vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& graph, 
+vector<pair<DeliveryPerson, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& graph, 
                                                                   Order order, 
                                                                   int numDeliveryPeople) 
 {
-    int startVertexId = order.getSellerAddress();
+    // Obtém vértice de origem
+    Vertex startVertex = graph.getVertex(order.getSellerAddress());
 
     // Obtém número |V| de vértices do grafo
     int m_numVertices = graph.getNumVertices();
@@ -34,35 +35,35 @@ vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& 
     MinHeap heap;
 
     // Define distância do vértice inicial como zero
-    distances[startVertexId] = 0;
+    distances[startVertex.getId()] = 0;
     // Coloca o vértice inicial com a sua distância até a origem no topo do heap
-    heap.push({distances[startVertexId], startVertexId});
+    heap.push({distances[startVertex.getId()], startVertex});
 
     // Cria uma lista para os entregadores selecionado: <distância até o vértice de origem, ID do entregador>
-    vector<pair<int, int>> deliveryPeopleFound;
+    vector<pair<DeliveryPerson, int>> deliveryPeopleFound;
     // Número de entregadores selecionados
     int peopleFound = 0;
 
     // Enquanto o heap não está vazio e o número de entregadores selecionados é menor do que o exigido, fazemos:
     while (!heap.empty() && peopleFound < numDeliveryPeople) {
         // Removemos o vértice com a menor distância do heap
-        int currentVertexId = heap.top().second;
+        Vertex currentVertex = heap.top().second;
         heap.pop();
 
         // Se o vértice atual já foi visitado, ignoramos ele
-        if (visited[currentVertexId]) {
+        if (visited[currentVertex.getId()]) {
             continue;
         }
         // Define o vértice atual como visitado
-        visited[currentVertexId] = true;
+        visited[currentVertex.getId()] = true;
 
         // Se a distância do vértice atual é máxima, já visitamos todos os vértices possíveis
-        if (distances[currentVertexId]  == numeric_limits<int>::max()) {
+        if (distances[currentVertex.getId()]  == numeric_limits<int>::max()) {
             break;
         }
 
         // Lista de entregadores no vértice atual
-        vector<DeliveryPerson> deliveryPeople = graph.getVertex(currentVertexId).getDeliveryPeople();
+        vector<DeliveryPerson> deliveryPeople = currentVertex.getDeliveryPeople();
 
         // Percorremos a lista deliveryPeople adicionando o entregador a lista de entregadores selecionados 
         // se o número de entregadores procurado não tiver sido atingido
@@ -71,10 +72,10 @@ vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& 
             // 'deliveryPerson' é o atual elemento de 'deliveryPeople'
             for (const DeliveryPerson& deliveryPerson : deliveryPeople) 
             {
-                // Adiciona <ID do entregador, distância> à lista de selecionados se ela não estiver cheia
+                // Adiciona <Entregador, distância> à lista de selecionados se ela não estiver cheia
                 if (peopleFound < numDeliveryPeople) 
                 {
-                    deliveryPeopleFound.push_back({deliveryPerson.getId(), distances[currentVertexId]});
+                    deliveryPeopleFound.push_back({deliveryPerson, distances[currentVertex.getId()]});
                     peopleFound++;
                 } 
                 else 
@@ -85,24 +86,24 @@ vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& 
         }
         
         // Iterate pelas arestas do vértice atual
-        for (EdgeNode* edge = graph.getEdges(currentVertexId); edge != nullptr; edge = edge->getNext())
+        for (EdgeNode* edge = graph.getEdges(currentVertex.getId()); edge != nullptr; edge = edge->getNext())
         {
             // Pega o índice do vértice vizinho
-            int neighborVertexId = edge->otherVertex().getId();
+            Vertex neighborVertex = edge->otherVertex();
 
             // Se o vizinho não foi visitado ainda
-            if(!visited[neighborVertexId])
+            if(!visited[neighborVertex.getId()])
             {
                 // Acessamos o comprimento da aresta
                 int edgeLength = edge->getLength();
 
                 // Se a distância de v1 + comprimento da rua < v2 atual
-                if (distances[currentVertexId] + edgeLength < distances[neighborVertexId]) 
+                if (distances[currentVertex.getId()] + edgeLength < distances[neighborVertex.getId()]) 
                 {
                     // Atualizamos v2 = distância de v1 + comprimento da rua
-                    distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
+                    distances[neighborVertex.getId()] = distances[currentVertex.getId()] + edgeLength;
                     // Adicionamos o novo vértice à lista
-                    heap.push({distances[neighborVertexId], neighborVertexId});
+                    heap.push({distances[neighborVertex.getId()], neighborVertex});
                 }
             }
         }
@@ -124,20 +125,21 @@ vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& 
 
 vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph,
                                                              Order order, 
-                                                             int DeliveryPersonId) 
+                                                             DeliveryPerson deliveryPerson) 
 {
-    int sellerVertexId = order.getSellerAddress();
-    int clientVertexId = order.getClientAddress();
+
+    Vertex sellerVertex = graph.getVertex(order.getSellerAddress());
+    Vertex clientVertex = graph.getVertex(order.getClientAddress());
     // A lista para armazenar a rota final
     vector<EdgeNode*> route;
 
     // Primeiro, encontrar o caminho do entregador até o vendedor
-    vector<int> pathToSeller = findPath(graph, DeliveryPersonId, sellerVertexId);
+    vector<Vertex> pathToSeller = findPath(graph, deliveryPerson.getId(), sellerVertex);
     // Adiciona este caminho à rota
     addToRoute(graph, route, pathToSeller);
 
     // Depois, encontrar o caminho do vendedor até o cliente
-    vector<int> pathToClient = findPath(graph, sellerVertexId, clientVertexId);
+    vector<Vertex> pathToClient = findPath(graph, sellerVertex, clientVertex);
     // Adiciona este caminho à rota
     addToRoute(graph, route, pathToClient);
 
@@ -146,39 +148,39 @@ vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph
 }
 
 // Dijkstra para encontrar o menor caminho
-vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, int endVertexId) {
+vector<Vertex> GraphOperations::findPath(GraphAdjList& graph, Vertex startVertex, Vertex endVertex) {
     MinHeap heap;
     vector<int> distances(graph.getNumVertices(), numeric_limits<int>::max());
     vector<bool> visited(graph.getNumVertices(), false);
-    vector<int> parents(graph.getNumVertices(), -1);
+    vector<Vertex> parents(graph.getNumVertices(), -1);
 
-    distances[startVertexId] = 0;
-    parents[startVertexId] = startVertexId;
-    heap.push({distances[startVertexId], startVertexId});
+    distances[startVertex.getId()] = 0;
+    parents[startVertex.getId()] = startVertex.getId();
+    heap.push({distances[startVertex.getId()], startVertex});
 
 
 
     while (!heap.empty()) {
         
-        int currentVertexId = heap.top().second; // Vertice com valor minimo
+        Vertex currentVertex = heap.top().second; // Vertice com valor minimo
         heap.pop(); // Remove Verice do Heap
 
-        if (distances[currentVertexId] == numeric_limits<int>::max()) { break; }
+        if (distances[currentVertex.getId()] == numeric_limits<int>::max()) { break; }
 
-        if (visited[currentVertexId]) continue;
-        visited[currentVertexId] = true;
+        if (visited[currentVertex.getId()]) continue;
+        visited[currentVertex.getId()] = true;
 
-        if (currentVertexId == endVertexId) break;
-        EdgeNode* edge = graph.getEdges(currentVertexId);
+        if (currentVertex.getId() == endVertex.getId()) break;
+        EdgeNode* edge = graph.getEdges(currentVertex.getId());
 
         while(edge){
             int neighborVertexId = edge->otherVertex().getId();
             if (!visited[neighborVertexId]) {
                 int edgeLength = edge->getLength();
 
-                if(distances[currentVertexId] + edgeLength < distances[neighborVertexId]){
-                    parents[neighborVertexId] = currentVertexId;
-                    distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
+                if(distances[currentVertex.getId()] + edgeLength < distances[neighborVertexId]){
+                    parents[neighborVertexId] = currentVertex;
+                    distances[neighborVertexId] = distances[currentVertex.getId()] + edgeLength;
                     heap.push({distances[neighborVertexId], neighborVertexId});
                 }
                 
@@ -187,13 +189,13 @@ vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, in
             edge = edge->getNext();
         
         }
-        visited[currentVertexId] = true;
+        visited[currentVertex.getId()] = true;
     }
 
     // Reconstruir o caminho do destino de volta à origem
-    vector<int> path;
-    for (int at = endVertexId; at != -1; at = parents[at]) {
-        path.push_back(at);
+    vector<Vertex> path;
+    for (Vertex v = endVertex; v.getId() != startVertex.getId(); v = parents[v.getId()]) {
+        path.push_back(v);
     }
     reverse(path.begin(), path.end()); // O caminho está na ordem inversa
     return path;
@@ -201,18 +203,18 @@ vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, in
 
 
 // Define a função que adiciona arestas ao vetor de rota com base em uma sequencia de vertices
-void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, vector<int> path) {
+void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, vector<Vertex> path) {
     // Itera sobre cada vértice no caminho, exceto o último
     for (size_t i = 0; i < path.size() - 1; ++i) {
-        // ID do vértice atual no caminho
-        int from = path[i];
-        // ID do próximo vértice no caminho
-        int to = path[i + 1];
+        // Vértice atual no caminho
+        Vertex from = path[i];
+        // Próximo vértice no caminho
+        Vertex to = path[i + 1];
         
         // Itera sobre as arestas que saem do vértice from
-        for (EdgeNode* edge = graph.getEdges(from); edge != nullptr; edge = edge->getNext()) {
+        for (EdgeNode* edge = graph.getEdges(from.getId()); edge != nullptr; edge = edge->getNext()) {
             // Verifica se a aresta conecta ao vértice to
-            if (edge->otherVertex().getId() == to) {
+            if (edge->otherVertex().getId() == to.getId()) {
                 // Se sim, adiciona a aresta ao vetor route
                 route.push_back(edge);
                 // Sai do loop interno, pois a aresta correta foi encontrada
@@ -233,6 +235,7 @@ void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, 
     entregador, o centro de distribuição, e a lista de segmentos representando a rota.
 */
 
+/*
 // Pseudocode for Dijkstra's Algorithm
 map<int, int> runDijkstra(GraphAdjList& graph, int startVertex);
 
@@ -276,6 +279,7 @@ void findBestDeliveryRoutes(GraphAdjList& graph, const vector<int>& cdsWithProdu
 
     // selectedPaths now contains the best routes
 }
+*/
 
 /*
         OPERAÇÃO 4: sugerir entregas adicionais com base em uma rota.

@@ -16,7 +16,7 @@ private:
 
 public:
     // Construtor para inicializar um objeto Seller
-    Seller(const int& sellerId);
+    Seller(const int& sellerId, const int& sellerAddress);
 
     // Métodos de acesso para retornar atributos seller ID
     int getId() const;
@@ -26,7 +26,6 @@ public:
     void removeProduct(const int& productId);        // Remove produto
     Product getProduct(const int& productId) const;  // Pega produto
     int getAddress() const;                          // Pega endereço
-    void setAddress(const int& address);             // Atribui endereço
 };
 
 #endif

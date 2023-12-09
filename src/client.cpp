@@ -1,8 +1,9 @@
 #include "../headers/client.h"
 
 // Construtor da classe Cliente
-Client::Client(const int& clientId)
+Client::Client(const int& clientId, const int& clientAddress)
     : id(clientId)
+    , address(clientAddress)
 {}
 
 // Retorna o ID do cliente
@@ -23,9 +24,4 @@ vector<Order> Client::getOrders() const {
 // Retorna o endereço do cliente
 int Client::getAddress() const {
     return address;
-}
-
-// Atribui o endereço do cliente
-void Client::setAddress(const int& address) {
-    this->address = address;
 }

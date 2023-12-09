@@ -1,5 +1,4 @@
 #include <iostream>
-#include "../headers/structure.h"
 #include "../headers/txt_reader.h"
 #include "../headers/operations.h"
 #include <unistd.h>
@@ -60,7 +59,7 @@ GraphAdjList menuOpcoes()
         case 1:
         {
             cout << "Excelente opção!!!" << endl; 
-            return readFile("Caso de teste 1.txt");
+            return readFile("./graph_maps/op1/Caso de teste 1.txt");
         }
         case 2:
         {
@@ -118,18 +117,20 @@ void escolhaOperacoes(GraphAdjList graph)
         case 1:
         {
             cout << "Excelente opção!!!" << endl; 
+
             // operação 1
             Client client = graph.getClient(1);
-            cout << "O cliente é: " << client.getId();
-            Order order = client.getOrders()[0];
-            cout << "O pedido é: " << order.getId() << " - " << order.getClientAddress() << " - " << order.getSellerAddress() << endl;
-            vector<pair<int, int>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 3);
+            vector<Order> orders = client.getOrders();
+            Order order = orders[0];
+
+            cout << "O pedido " << order.getId() << " do cliente " << client.getId() << " tem como origem o vértice " << order.getSellerAddress() << " e como destino o vértice " << order.getClientAddress() << endl;
+            vector<pair<DeliveryPerson, int>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 3);
 
             // Imprime os entregadores mais próximos
             cout << "Os entregadores mais próximos são: " << endl;
             for (int i = 0; i < DeliveryPeople.size(); i++)
             {
-                cout << "Entregador " << i+1 << ": " << DeliveryPeople[i].first << " - " << DeliveryPeople[i].second << endl;
+                cout << "Entregador " << i+1 << ": " << DeliveryPeople[i].first.getId() << " com distância " << DeliveryPeople[i].second << endl;
             }
         }
         case 2:
