@@ -164,7 +164,7 @@ void readOrder(GraphAdjList& g, stringstream& iss)
     if (s_orderType == "Simple") orderType = OrderType::Simple;
     else if (s_orderType == "Optimized") orderType = OrderType::Optimized;
 
-    Order o(id, g.getProduct(product), orderType);
+    Order o(id, g.getProduct(product), orderType, -1, -1);
     o.setClientAddress(g.getClient(client).getAddress());
     o.setSellerAddress(g.getSeller(seller).getAddress());
     g.getClient(client).addOrder(o);

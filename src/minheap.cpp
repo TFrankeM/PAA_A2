@@ -2,14 +2,15 @@
 #include <algorithm>            // Para swap
 
 
-// Construtor
+// Construtor que inicializa o heap com tamanho 0
 MinHeap::MinHeap() 
     : size(0) 
 {}
 
+// Função Heapify para manter a propriedade min-heap
 void MinHeap::heapify(int index) 
 {
-    int smallest = index;   // Índice atual
+    int smallest = index;       // Índice atual
     
     // Calcula o índice dos nós filhos da esquerda e direita
     int left = 2 * index + 1;
@@ -28,7 +29,7 @@ void MinHeap::heapify(int index)
     // Se o menor nó não é o nó de ínicio, trocamos o nó de início com o menor 
     // nó e executamos heapify recursivamente na subárvore
     if (smallest != index) {
-        swap(heap[index], heap[smallest]);
+        std::swap(heap[index], heap[smallest]);
         heapify(smallest);
     }
 }
@@ -42,8 +43,8 @@ void MinHeap::push(pair<int, int> element)
 
     // Enquanto o nó atual não for a cabeça e for menor do que o respectivo pai
     while (current > 0 && heap[current].first < heap[parent].first) {
-        swap(heap[current], heap[parent]);             // Trocamos o nó filho pelo pai
-        current = parent;                              // Repetimos iterativamente de baixo para cima no heap
+        std::swap(heap[current], heap[parent]);             // Trocamos o nó filho pelo pai
+        current = parent;                                   // Repetimos iterativamente de baixo para cima no heap
         parent = (parent - 1) / 2;
     }
 }

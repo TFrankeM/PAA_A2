@@ -1,10 +1,9 @@
 #include "../headers/operations.h"
-#include "../headers/minheap.h"     // Incluir classe MinHeap
 #include <vector>
 #include <limits>
 #include <algorithm>  // Para swap
 #include <utility>    // Para pair
-
+#include <map>
 
 /*
         OPERAÇÃO 1: encontrar entregadores próximos.
@@ -124,7 +123,7 @@ vector<pair<int, int>> GraphOperations::findNearestDeliveryPeople(GraphAdjList& 
 
 vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph,
                                                              Order order, 
-                                                             int DeliveryPersonId) 
+                                                             int DeliveryPersonAddress) 
 {
     int sellerVertexId = order.getSellerAddress();
     int clientVertexId = order.getClientAddress();
@@ -132,7 +131,7 @@ vector<EdgeNode*> GraphOperations::defineSimpleDeliveryRoute(GraphAdjList& graph
     vector<EdgeNode*> route;
 
     // Primeiro, encontrar o caminho do entregador até o vendedor
-    vector<int> pathToSeller = findPath(graph, DeliveryPersonId, sellerVertexId);
+    vector<int> pathToSeller = findPath(graph, DeliveryPersonAddress, sellerVertexId);
     // Adiciona este caminho à rota
     addToRoute(graph, route, pathToSeller);
 
@@ -155,8 +154,6 @@ vector<int> GraphOperations::findPath(GraphAdjList& graph, int startVertexId, in
     distances[startVertexId] = 0;
     parents[startVertexId] = startVertexId;
     heap.push({distances[startVertexId], startVertexId});
-
-
 
     while (!heap.empty()) {
         
@@ -233,49 +230,154 @@ void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, 
     entregador, o centro de distribuição, e a lista de segmentos representando a rota.
 */
 
-// Pseudocode for Dijkstra's Algorithm
-map<int, int> runDijkstra(GraphAdjList& graph, int startVertex);
+// struct Path {
+//     int deliveryPersonId;           // ID do entregador
+//     int distributionCenterId;       // ID do centro de distribuição
+//     vector<int> route;              // Lista com os ID's dos vértices que formam a rota
+//     int totalDistance;              // Distância total do trajeto
 
-#include <queue>
-#include <vector>
-#include <map>
+//     bool operator>(const Path& other) const {
+//         return totalDistance > other.totalDistance;
+//     }
+// };
 
-struct Path {
-    int deliveryPersonId;
-    int totalDistance;
-    int cdId;
+// void dijkstraFromDistributionCente(GraphAdjList& graph, MaxHeap& maxHeap, int startVertexId, int numDeliveryPeople) 
+// {
+//     // Obtém número |V| de vértices do grafo
+//     int m_numVertices = graph.getNumVertices();
 
-    bool operator>(const Path& other) const {
-        return totalDistance > other.totalDistance;
-    }
-};
+//     // Lista "distancia" de tamanho |V| com valores infinito
+//     vector<int> distances(m_numVertices, numeric_limits<int>::max());
 
-// Min-Heap (Priority Queue)
-priority_queue<Path, vector<Path>, greater<>> minHeap;
+//     // Lista "parent" de tamanho |V| com valores -1
+//     vector<int> parent(m_numVertices, -1);
 
-void findBestDeliveryRoutes(GraphAdjList& graph, const vector<int>& cdsWithProduct, int clientId, int numDeliveryPeople) {
-    for (int cdId : cdsWithProduct) {
-        auto distancesFromCD = runDijkstra(graph, cdId);
-        int distanceToClient = distancesFromCD[clientId];
+//     // Lista "visitado" de tamanho |V| com valores falso
+//     vector<bool> visited(m_numVertices, false);
 
-        for (auto& deliveryPerson : graph.getDeliveryPeople()) {
-            int deliveryPersonId = deliveryPerson.getId();
-            int distanceToDeliveryPerson = distancesFromCD[deliveryPersonId];
-            int totalDistance = distanceToClient + distanceToDeliveryPerson;
+//     // Cria uma fila de prioridade heap, ordenando da menor para a maior distância
+//     MinHeap heap;
 
-            Path path = {deliveryPersonId, totalDistance, cdId};
-            minHeap.push(path);
-        }
-    }
+//     // Define distância do vértice inicial como zero
+//     distances[startVertexId] = 0;
+//     // Coloca o vértice inicial com a sua distância até a origem no topo do heap
+//     heap.push({distances[startVertexId], startVertexId});
 
-    vector<Path> selectedPaths;
-    for (int i = 0; i < numDeliveryPeople && !minHeap.empty(); ++i) {
-        selectedPaths.push_back(minHeap.top());
-        minHeap.pop();
-    }
+//     // Cria uma lista para os entregadores selecionado: <distância até o vértice de origem, ID do entregador>
+//     vector<pair<int, int>> deliveryPeopleFound;
+//     // Número de entregadores selecionados
+//     int peopleFound = 0;
 
-    // selectedPaths now contains the best routes
-}
+//     // Enquanto o heap não está vazio e o número de entregadores selecionados é menor do que o exigido, fazemos:
+//     while (!heap.empty() && peopleFound < numDeliveryPeople) {
+//         // Removemos o vértice com a menor distância do heap
+//         int currentVertexId = heap.top().second;
+//         heap.pop();
+
+//         // Se a menor distância 
+//         if(maxHeap.top().totalDistance < distances[currentVertexId]) {
+//             break;
+//         }
+
+//         // Se o vértice atual já foi visitado, ignoramos ele
+//         if (visited[currentVertexId]) {
+//             continue;
+//         }
+//         // Define o vértice atual como visitado
+//         visited[currentVertexId] = true;
+
+//         // Se a distância do vértice atual é máxima, já visitamos todos os vértices possíveis
+//         if (distances[currentVertexId]  == numeric_limits<int>::max()) {
+//             break;
+//         }
+
+//         // Lista de entregadores no vértice atual
+//         vector<DeliveryPerson> deliveryPeople = graph.getVertex(currentVertexId).getDeliveryPeople();
+
+//         // Percorremos a lista deliveryPeople adicionando o entregador a lista de entregadores selecionados 
+//         // se o número de entregadores procurado não tiver sido atingido
+//         if (!deliveryPeople.empty())
+//         {
+//             // 'deliveryPerson' é o atual elemento de 'deliveryPeople'
+//             for (const DeliveryPerson& deliveryPerson : deliveryPeople) 
+//             {
+//                 // Adiciona <ID do entregador, distância> à lista de selecionados se ela não estiver cheia
+//                 if (peopleFound < numDeliveryPeople) 
+//                 {
+//                     deliveryPeopleFound.push_back({deliveryPerson.getId(), distances[currentVertexId]});
+//                     peopleFound++;
+//                 } 
+//                 else 
+//                 {
+//                     break; // Sai do loop se foram encontradas pessoas suficientes
+//                 }
+//             }
+//         }
+        
+//         // Iterate pelas arestas do vértice atual
+//         for (EdgeNode* edge = graph.getEdges(currentVertexId); edge != nullptr; edge = edge->getNext())
+//         {
+//             // Pega o índice do vértice vizinho
+//             int neighborVertexId = edge->otherVertex().getId();
+
+//             // Se o vizinho não foi visitado ainda
+//             if(!visited[neighborVertexId])
+//             {
+//                 // Acessamos o comprimento da aresta
+//                 int edgeLength = edge->getLength();
+
+//                 // Se a distância de v1 + comprimento da rua < v2 atual
+//                 if (distances[currentVertexId] + edgeLength < distances[neighborVertexId]) 
+//                 {
+//                     // Atualizamos v2 = distância de v1 + comprimento da rua
+//                     distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
+//                     // Adicionamos o novo vértice à lista
+//                     heap.push({distances[neighborVertexId], neighborVertexId});
+//                 }
+//             }
+//         }
+//     }
+
+//     return deliveryPeopleFound;
+// }
+
+// vector<Path> findBestDeliveryRoutes(GraphAdjList& graph, 
+//                                                      vector<DistributionCenter>& distributionCenters, 
+//                                                      Order order, 
+//                                                      int numDeliveryPeople) {
+    
+//     // Id do produto do pedido
+//     int productId = order.getProduct().getId();
+
+//     // Cria uma fila de prioridade heap, ordenando da maior para a menor distância
+//     MaxHeap maxHeap;
+
+//     // Cria uma lista de caminhos selecionados
+//     vector<Path> selectedPaths; 
+
+//     // Percorremos a lista de centros de distribuição adicionando realizando o Dijkstra a partir da posição dele
+//     // 'distributionCenter' é o atual elemento de 'distributionCenters'
+//     for (const DistributionCenter& distributionCenter : distributionCenters) 
+//     {
+//         // Adiciona <ID do entregador, distância> à lista de selecionados se ela não estiver cheia
+//         if (distributionCenter.isProductAvailable(productId)) 
+//         {
+//             // Endereço do centro de distribuição
+//             int distributionCenterAddress = distributionCenter.getAddress();
+//             // Executamos o Dijkstra a partir do centro de distribuição
+//             dijkstraFromDistributionCente(GraphAdjList& graph, 
+//                                           MaxHeap& maxHeap,
+//                                           int distributionCenterAddress, 
+//                                           int numDeliveryPeople);
+//         }
+//     }
+//     // Passa os caminhos do encontrados para um vetor 
+//     selectedPaths = maxHeap;
+//     return selectedPaths
+    
+
+//     // selectedPaths now contains the best routes
+// }
 
 /*
         OPERAÇÃO 4: sugerir entregas adicionais com base em uma rota.

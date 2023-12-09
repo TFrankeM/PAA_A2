@@ -50,3 +50,13 @@ bool DistributionCenter::isProductAvailable(const int& productId) const
     return it != inventory.end() && it->second > 0;         // Ele deve estar no CD e com quantidade maio que zero
 }
 
+// Retorna o endereço do cliente
+int DistributionCenter::getAddress() const 
+{
+    return address;
+}
+
+// Atribui o endereço do cliente
+void DistributionCenter::setAddress(const int& address) {
+    this->address = address;
+}

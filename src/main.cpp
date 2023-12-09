@@ -109,7 +109,7 @@ void escolhaOperacoes(GraphAdjList graph)
 {
     int escolha = 0;
     cout << " ==> Digite a sua escolha [1, 2, 3 ou 4]: ";
-    // cin >> escolha;
+    //cin >> escolha;
     GraphOperations graphOp;
 
     escolha = 1;
