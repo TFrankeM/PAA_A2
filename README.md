@@ -43,7 +43,7 @@
 </p>
 
 <div align="center">
-	<img src = "imagem do menu principal" width=40%> 
+	<img src = "img/menuPrincipal.png" width=40%> 
 </div>
 
 <hr>
@@ -53,7 +53,7 @@
 </p>
 
 <div align="center">
-	<img src = "imagem do menu de operações" width=40%> 
+	<img src = "img/menuDeOperacoes.png" width=40%> 
 </div>
 
 <hr>
