@@ -7,7 +7,7 @@ using namespace std;
 
 class Client {
 private:
-    int id;                  // Identificador único do cliente
+    int id;                     // Identificador único do cliente
     vector<Order> orders;       // Pedidos feitos pelo cliente
 
 public:
@@ -15,7 +15,7 @@ public:
     Client(const int& clientId);
 
     // Métodos de acesso
-    int getId() const;                   // Pegar ID do usuário
+    int getId() const;                      // Pegar ID do usuário
     void addOrder(const Order& order);      // Adicionar novo pedido do usuário
     vector<Order> getOrders() const;        // Pegar lista de pedidos do usuário
 };

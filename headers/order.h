@@ -24,7 +24,7 @@ private:
 
 public:
     // Construtor para inicializar um pedido
-    Order(const int& orderId, const Product& orderedProduct, OrderType orderType);
+    Order(const int& orderId, const Product& orderedProduct, OrderType orderType, int orderSeller, int orderClient);
 
     // Métodos de acesso
     int getId() const;              // Pega o ID do pedido

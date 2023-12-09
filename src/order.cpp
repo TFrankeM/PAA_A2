@@ -1,10 +1,12 @@
 #include "../headers/order.h"
 
 // Implementação do construtor
-Order::Order(const int& orderId, const Product& orderedProduct, OrderType orderType)
+Order::Order(const int& orderId, const Product& orderedProduct, OrderType orderType, int orderSeller, int orderClient)
     : id(orderId)
     , product(orderedProduct)
     , type(orderType) 
+    , sellerAddress(orderSeller)
+    , clientAddress(orderClient)
 {}
 
 // Retorna o ID do pedido
