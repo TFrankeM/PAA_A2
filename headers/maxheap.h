@@ -33,6 +33,7 @@ public:
     void pop();                     // Remove o elemento do topo do heap
     Path top() const;               // Retorna o elemento do topo do heap
     bool empty() const;             // Checa se o heap está vazio
+    int getSize() const;            // Obtém o tamanho do heap
 };
 
 #endif
