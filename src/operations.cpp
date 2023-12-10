@@ -230,154 +230,210 @@ void GraphOperations::addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, 
     entregador, o centro de distribuição, e a lista de segmentos representando a rota.
 */
 
-// struct Path {
-//     int deliveryPersonId;           // ID do entregador
-//     int distributionCenterId;       // ID do centro de distribuição
-//     vector<int> route;              // Lista com os ID's dos vértices que formam a rota
-//     int totalDistance;              // Distância total do trajeto
+// Função para calcular as melhores rotas de entrega
+vector<Path> GraphOperations::findBestDeliveryRoutes(GraphAdjList& graph, 
+                                                     const Order& order, 
+                                                     const vector<DistributionCenter>& distributionCenters, 
+                                                     int numDeliveryPeople) 
+{
+    // Id do produto do pedido
+    int productId = order.getProduct().getId();
 
-//     bool operator>(const Path& other) const {
-//         return totalDistance > other.totalDistance;
-//     }
-// };
+    // Endereço do cliente
+    int clientAddress = order.getClientAddress();
 
-// void dijkstraFromDistributionCente(GraphAdjList& graph, MaxHeap& maxHeap, int startVertexId, int numDeliveryPeople) 
-// {
-//     // Obtém número |V| de vértices do grafo
-//     int m_numVertices = graph.getNumVertices();
+    // Lista de caminhos selecionados
+    vector<Path> selectedPaths;
 
-//     // Lista "distancia" de tamanho |V| com valores infinito
-//     vector<int> distances(m_numVertices, numeric_limits<int>::max());
+    // Cria um heap ordenando da maior para a menor distância
+    MaxHeap heapMaximo;
 
-//     // Lista "parent" de tamanho |V| com valores -1
-//     vector<int> parent(m_numVertices, -1);
+    // Itera sobre cada centro de distribuição
+    for (const DistributionCenter& center : distributionCenters) {
+        // Verifica se o produto do pedido está disponível no centro de distribuição
+        if (!center.isProductAvailable(productId))
+        {
+            continue;   // Se não está, ignoramos esse centro
+        }
 
-//     // Lista "visitado" de tamanho |V| com valores falso
-//     vector<bool> visited(m_numVertices, false);
+        // Calcula as rotas dos entregadores mais próximos usando Dijkstra
+        vector<Path> nearestDeliveryPeople = calculatesDijkstraDistance(graph, 
+                                                                       center.getId(), 
+                                                                       center.getAddress(), 
+                                                                       numDeliveryPeople,
+                                                                       clientAddress);
 
-//     // Cria uma fila de prioridade heap, ordenando da menor para a maior distância
-//     MinHeap heap;
+        // Itera sobre os entregadores mais próximos encontrados
+        for (const Path& path : nearestDeliveryPeople) {
+            // Se a fila de máximos excede o número desejado de entregadores, remove o elemento de maior distância
+            if (heapMaximo.getSize() >= numDeliveryPeople) 
+            {
+                heapMaximo.pop();
+            }
+            // Insere o elemento na fila de máximos
+            heapMaximo.push(path);
+        }
+    }
 
-//     // Define distância do vértice inicial como zero
-//     distances[startVertexId] = 0;
-//     // Coloca o vértice inicial com a sua distância até a origem no topo do heap
-//     heap.push({distances[startVertexId], startVertexId});
+    // Transfere as melhores rotas da fila de máximos para o vetor de resultados
+    while (!heapMaximo.empty()) {
+        selectedPaths.push_back(heapMaximo.top());
+        heapMaximo.pop();
+    }
 
-//     // Cria uma lista para os entregadores selecionado: <distância até o vértice de origem, ID do entregador>
-//     vector<pair<int, int>> deliveryPeopleFound;
-//     // Número de entregadores selecionados
-//     int peopleFound = 0;
+    return selectedPaths;
+}
 
-//     // Enquanto o heap não está vazio e o número de entregadores selecionados é menor do que o exigido, fazemos:
-//     while (!heap.empty() && peopleFound < numDeliveryPeople) {
-//         // Removemos o vértice com a menor distância do heap
-//         int currentVertexId = heap.top().second;
-//         heap.pop();
+// Função para calcular as distâncias dos entregadores usando o algoritmo de Dijkstra
+vector<Path> GraphOperations::calculatesDijkstraDistance(GraphAdjList& graph, 
+                                                        int distributionCenterID, 
+                                                        int centerAddress, 
+                                                        int numDeliveryPeople,
+                                                        int clientAddress) 
+{
+    // Define infinito
+    const int infinito = numeric_limits<int>::max();
 
-//         // Se a menor distância 
-//         if(maxHeap.top().totalDistance < distances[currentVertexId]) {
-//             break;
-//         }
+    // Obtém número |V| de vértices do grafo
+    int m_numVertices = graph.getNumVertices();
 
-//         // Se o vértice atual já foi visitado, ignoramos ele
-//         if (visited[currentVertexId]) {
-//             continue;
-//         }
-//         // Define o vértice atual como visitado
-//         visited[currentVertexId] = true;
+    // Heap minimo
+    MinHeap heap;
 
-//         // Se a distância do vértice atual é máxima, já visitamos todos os vértices possíveis
-//         if (distances[currentVertexId]  == numeric_limits<int>::max()) {
-//             break;
-//         }
+    // Lista de distâncias dos vértices até centerAddress
+    vector<int> distances(m_numVertices, infinito);
+    // Lista de vertices visitados
+    vector<bool> visited(m_numVertices, false);
+    // Lista de vértices pais
+    vector<int> parents(m_numVertices, -1);
 
-//         // Lista de entregadores no vértice atual
-//         vector<DeliveryPerson> deliveryPeople = graph.getVertex(currentVertexId).getDeliveryPeople();
+    // Distância e pai do vértice do centro é 0 e ele mesmo, respectivamente
+    distances[centerAddress] = 0;
+    parents[centerAddress] = centerAddress;
 
-//         // Percorremos a lista deliveryPeople adicionando o entregador a lista de entregadores selecionados 
-//         // se o número de entregadores procurado não tiver sido atingido
-//         if (!deliveryPeople.empty())
-//         {
-//             // 'deliveryPerson' é o atual elemento de 'deliveryPeople'
-//             for (const DeliveryPerson& deliveryPerson : deliveryPeople) 
-//             {
-//                 // Adiciona <ID do entregador, distância> à lista de selecionados se ela não estiver cheia
-//                 if (peopleFound < numDeliveryPeople) 
-//                 {
-//                     deliveryPeopleFound.push_back({deliveryPerson.getId(), distances[currentVertexId]});
-//                     peopleFound++;
-//                 } 
-//                 else 
-//                 {
-//                     break; // Sai do loop se foram encontradas pessoas suficientes
-//                 }
-//             }
-//         }
+    heap.push({0, centerAddress});
+
+    // Lista com os entregadores encontrados até o momento
+    vector<Path> deliveryPeopleFound;
+
+    // Guardar informações do cliente
+    int distanceClient = infinito;
+    vector<int> pathClient;
+
+    // Cliente ainda não foi visitado
+    bool clientVisited = false;
+
+    // Enquanto o heap não está vazio, o número de entregadores encontrados não é suficiente e 
+    // o cliente não foi visitado
+    while (!heap.empty() && deliveryPeopleFound.size() < numDeliveryPeople && !clientVisited) {
+        // Removemos o vértice com a menor distância do heap
+        Vertex currentVertex = heap.top().second;
+        heap.pop();
+
+        // Se o vértice atual já foi visitado, ignoramos ele
+        if (visited[currentVertex.getId()]) 
+        {
+            continue;
+        }
+
+        // Define o vértice atual como visitado
+        visited[currentVertex.getId()] = true;
+
+        // Se a distância do vértice atual é máxima, já visitamos todos os vértices possíveis
+        if (distances[currentVertex.getId()]  == infinito) {
+            break;
+        }
+
+        // Lista de entregadores no vértice atual
+        vector<DeliveryPerson> deliveryPeople = currentVertex.getDeliveryPeople();
+
+        // Percorremos a lista deliveryPeople adicionando o entregador a lista de entregadores selecionados 
+        // se o número de entregadores procurado não tiver sido atingido
+
+        // 'deliveryPerson' é o atual elemento de 'deliveryPeople'
+        for (const DeliveryPerson& deliveryPerson : deliveryPeople) 
+        {
+            // Adiciona <Entregador, distância> à lista de selecionados se ela não estiver cheia
+            if (deliveryPeopleFound.size() < numDeliveryPeople) 
+            {
+                // reconstruirRota: reconstroi a rota do centro de distribuição até o entregador (só que no sentido oposto)
+                // Salvamos na lista de entregadores
+                vector<int> pathToDeliveryPerson = reconstruirRota(parents, currentVertex.getId(), centerAddress);
+                int totalDistanceToDeliveryPerson = distances[currentVertex.getId()];
+                // Salva o entregador, o caminho até ele e a distância total até o momento.
+                deliveryPeopleFound.push_back({deliveryPerson.getId(), distributionCenterID, pathToDeliveryPerson, totalDistanceToDeliveryPerson});
+            } 
+            else 
+            {
+                break; // Sai do loop se foram encontradas pessoas suficientes
+            }
+        }
         
-//         // Iterate pelas arestas do vértice atual
-//         for (EdgeNode* edge = graph.getEdges(currentVertexId); edge != nullptr; edge = edge->getNext())
-//         {
-//             // Pega o índice do vértice vizinho
-//             int neighborVertexId = edge->otherVertex().getId();
+        // Se o vértice é o endereço do cliente
+        if (currentVertex.getId() == clientAddress) 
+        {
+            // Ele foi visitado
+            clientVisited = true;
 
-//             // Se o vizinho não foi visitado ainda
-//             if(!visited[neighborVertexId])
-//             {
-//                 // Acessamos o comprimento da aresta
-//                 int edgeLength = edge->getLength();
+            pathClient = reconstruirRota(parents, currentVertex.getId(), centerAddress);
+            distanceClient = distances[currentVertex.getId()];
+        }
 
-//                 // Se a distância de v1 + comprimento da rua < v2 atual
-//                 if (distances[currentVertexId] + edgeLength < distances[neighborVertexId]) 
-//                 {
-//                     // Atualizamos v2 = distância de v1 + comprimento da rua
-//                     distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
-//                     // Adicionamos o novo vértice à lista
-//                     heap.push({distances[neighborVertexId], neighborVertexId});
-//                 }
-//             }
-//         }
-//     }
+        // Iterate pelas arestas do vértice atual
+        for (EdgeNode* edge = graph.getEdges(currentVertex.getId()); edge != nullptr; edge = edge->getNext())
+        {
+            // Pega o índice do vértice vizinho
+            Vertex neighborVertex = edge->otherVertex();
 
-//     return deliveryPeopleFound;
-// }
+            // Se o vizinho não foi visitado ainda
+            if(!visited[neighborVertex.getId()])
+            {
+                // Acessamos o comprimento da aresta
+                int edgeLength = edge->getLength();
 
-// vector<Path> findBestDeliveryRoutes(GraphAdjList& graph, 
-//                                                      vector<DistributionCenter>& distributionCenters, 
-//                                                      Order order, 
-//                                                      int numDeliveryPeople) {
-    
-//     // Id do produto do pedido
-//     int productId = order.getProduct().getId();
+                // Se a distância de v1 + comprimento da rua < v2 atual
+                if (distances[currentVertex.getId()] + edgeLength < distances[neighborVertex.getId()]) 
+                {
+                    // Atualizamos v2 = distância de v1 + comprimento da rua
+                    distances[neighborVertex.getId()] = distances[currentVertex.getId()] + edgeLength;
+                    // Redefinimos o pai do vértice
+                    parents[neighborVertex.getId()] = currentVertex.getId();
+                    // Adicionamos o novo vértice à lista
+                    heap.push({distances[neighborVertex.getId()], neighborVertex});
+                }
+            }
+        }
+    }
 
-//     // Cria uma fila de prioridade heap, ordenando da maior para a menor distância
-//     MaxHeap maxHeap;
+    // A distância e a rota para o cliente já foram encontradas
+    // Agora precisamos adicionar a distância e a rota do cliente a cada entregador encontrado
+    for (Path& path : deliveryPeopleFound) {
+        // A rota do centro de distribuição até o cliente é adicionada à rota do entregador até o centro de distribuição
+        // .insert(position, first, last);
+        path.route.insert(path.route.end(), pathClient.begin(), pathClient.end());
+        // A distância total é a soma da distância até o centro de distribuição e a distância do centro até o cliente
+        path.totalDistance += distanceClient;
+    }
 
-//     // Cria uma lista de caminhos selecionados
-//     vector<Path> selectedPaths; 
+    return deliveryPeopleFound;
+}
 
-//     // Percorremos a lista de centros de distribuição adicionando realizando o Dijkstra a partir da posição dele
-//     // 'distributionCenter' é o atual elemento de 'distributionCenters'
-//     for (const DistributionCenter& distributionCenter : distributionCenters) 
-//     {
-//         // Adiciona <ID do entregador, distância> à lista de selecionados se ela não estiver cheia
-//         if (distributionCenter.isProductAvailable(productId)) 
-//         {
-//             // Endereço do centro de distribuição
-//             int distributionCenterAddress = distributionCenter.getAddress();
-//             // Executamos o Dijkstra a partir do centro de distribuição
-//             dijkstraFromDistributionCente(GraphAdjList& graph, 
-//                                           MaxHeap& maxHeap,
-//                                           int distributionCenterAddress, 
-//                                           int numDeliveryPeople);
-//         }
-//     }
-//     // Passa os caminhos do encontrados para um vetor 
-//     selectedPaths = maxHeap;
-//     return selectedPaths
-    
+// Função para reconstruir uma rota a partir dos pais dos vértices
+vector<int> GraphOperations::reconstruirRota(const vector<int>& parents, int vertex, int centerAddress) 
+{
+    vector<int> route;
 
-//     // selectedPaths now contains the best routes
-// }
+    // Percorre iterativamente adicionando vértice à rota
+    while (parents[vertex] != centerAddress) 
+    {
+        route.push_back(vertex);
+        vertex = parents[vertex];
+    }
+    route.push_back(centerAddress);
+
+    reverse(route.begin(), route.end());
+    return route;
+}
 
 /*
         OPERAÇÃO 4: sugerir entregas adicionais com base em uma rota.
