@@ -55,11 +55,43 @@ aresta 17 18
 aresta 18 19
 aresta 19 20
 
-vendedor 1 17 10 2
+produto 1 3 4
+produto 2 5 3
+produto 3 8 10
+produto 4 10 5
+produto 5 12 7
+produto 6 15 8
+produto 7 17 6
+produto 8 20 9
+produto 9 22 4
+
+
+vendedor 1 17 10 2 9 1 2 3 4 5 6 7 8 9
+
+CD 1 5 6 0.5 2 7 10 8 2
+CD 2 15 16 0.8 1 9 50
+CD 3 1 2 1.5 3 5 24 6 3 7 2
+CD 4 3 10 3.4 2 3 10 1 9
+CD 5 19 20 1.2 5 1 4 2 3 3 9 4 7 5 4
 
 entregador 1 7 20 3
 entregador 2 20 15 10
 entregador 3 4 5 2
 entregador 4 10 17 1
 entregador 5 12 19 6
-entregador 6 8 15 7 
+entregador 6 8 15 7
+entregador 7 2 9 4
+entregador 8 16 17 5
+
+cliente 1 10 17 1
+cliente 2 12 19 0
+cliente 3 8 15 2
+cliente 4 2 9 3.2
+cliente 5 16 17 2.1
+cliente 6 17 18 1.2
+
+ordem 1 1 1 Simple 1
+ordem 2 1 1 Optimized 9
+ordem 3 3 1 Optimized 6
+ordem 4 4 1 Simple 8
+ordem 5 6 1 Simple 10

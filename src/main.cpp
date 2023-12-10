@@ -58,15 +58,15 @@ GraphAdjList menuOpcoes()
     switch (escolha) {
         case 1:
         { 
-            return readFile("./graph_maps/op1/Caso_de_teste_1.txt");
+            return readFile("./graph_maps/Caso_de_teste_1.txt");
         }
         case 2:
         {
-            return readFile("./graph_maps/op1/Caso_de_teste_2.txt");
+            return readFile("./graph_maps/Caso_de_teste_2.txt");
         }
         case 3:
         {
-            return readFile("./graph_maps/op1/Caso_de_teste_3.txt");
+            return readFile("./graph_maps/Caso_de_teste_3.txt");
         }
         case 4:
         {   
