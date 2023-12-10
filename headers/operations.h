@@ -71,15 +71,18 @@ public:
 
     //////////////////////////////////////////////////////// 4 ////////////////////////////////////////////////////////
 
-    // Sugere entregas adicionais
-    vector<Order> findOrdersSugest(GraphAdjList& graph, Route& route); 
+    // funcoes auxiliares
+    vector<Order> filterOrdersByAvailability(const vector<Order> orders, const DistributionCenter& distributionCenter);
 
-    // funcao auxiliar para encontrar o faturamento maximo de um conjunto de orders
-    static vector<Order> getMaxPriceOrdersLimitedByCenter(Vertex* vertex, double weightLimit, DistributionCenter& distributionCenter);
+    bool orderByPricePerWeight(const Order a, const Order b);
 
-    // funcao auxiliar que calcula o peso e preco total de varias orders
+    vector<Order> getMaxPriceOrdersLimitedByCenter(const vector<Order> orders, double weightLimit);
+
+    vector<Order> findOrdersSugest(GraphAdjList& graph, Route& route);
+
+    // funcao auxiliar que calcula sugestao de outras entregas com base no faturamento 
+    // nao considera custo, apenas a capacidade do delivery
     std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orders);
 };
-
 #endif
 
