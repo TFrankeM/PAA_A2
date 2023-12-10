@@ -75,7 +75,7 @@ public:
     vector<Order> findOrdersSugest(GraphAdjList& graph, Route& route); 
 
     // funcao auxiliar para encontrar o faturamento maximo de um conjunto de orders
-    static vector<Order> getMaxPriceOrdersLimitedByCenter(Vertex& vertex, double weightLimit, DistributionCenter& distributionCenter);
+    static vector<Order> getMaxPriceOrdersLimitedByCenter(Vertex* vertex, double weightLimit, DistributionCenter& distributionCenter);
 
     // funcao auxiliar que calcula o peso e preco total de varias orders
     std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orders);

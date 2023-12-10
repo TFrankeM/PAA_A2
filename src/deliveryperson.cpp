@@ -72,3 +72,9 @@ void DeliveryPerson::setAddress(const int& address)
 {
     this->address = address;
 }
+
+// Retorna a capacidade atual disponível do entregador
+double DeliveryPerson::getCurrentCapacityAvailable() const 
+{
+    return capacity - currentWeight;
+}

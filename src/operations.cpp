@@ -459,8 +459,8 @@ std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orde
 
 
 
-vector<Order> GraphOperations::getMaxPriceOrdersLimitedByCenter(Vertex& vertex, double weightLimit, DistributionCenter& distributionCenter) {
-        vector<Order> orders = vertex.getCrescentePriceOrders();
+vector<Order> GraphOperations::getMaxPriceOrdersLimitedByCenter(Vertex* vertex, double weightLimit, DistributionCenter& distributionCenter) {
+        vector<Order> orders = vertex->getCrescentePriceOrders();
 
         vector<Order> bestCombo;
         double bestPrice = 0.0;
@@ -504,6 +504,7 @@ vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& rout
 
     Order order = route.getOrder();  
     int startVertexId = order.getClientAddress();
+    Vertex* startVertex = graph.getVertex(startVertexId);
     DeliveryPerson deliveryperson = route.getDeliveryPerson();  
     DistributionCenter distributionCenter = route.getDistributionCenter();  
 
@@ -520,39 +521,39 @@ vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& rout
     double lowestCost = std::numeric_limits<double>::max();
 
     distances[startVertexId] = 0;
-    heap.push({distances[startVertexId], startVertexId});
+    heap.push({distances[startVertexId], startVertex});
 
 
     while (!heap.empty()) {
         
-        int currentVertexId = heap.top().second; // Vertice com valor minimo
+        Vertex* currentVertex = heap.top().second; // Vertice com valor minimo
         heap.pop(); // Remove Verice do Heap
 
-        if (distances[currentVertexId] == INT_MAX) { break; }
+        if (distances[currentVertex->getId()] == INT_MAX) { break; }
 
-        if (visited[currentVertexId]) continue;
-        visited[currentVertexId] = true;
+        if (visited[currentVertex->getId()]) continue;
+        visited[currentVertex->getId()] = true;
 
 
-        EdgeNode* edge = graph.getEdges(currentVertexId);
+        EdgeNode* edge = graph.getEdges(currentVertex->getId());
 
 
         while(edge){
-            Vertex neighborVertex = edge->otherVertex();
-            int neighborVertexId = neighborVertex.getId();
+            Vertex* neighborVertex = edge->otherVertex();
+            int neighborVertexId = neighborVertex->getId();
             if (!visited[neighborVertexId]) {
                 int edgeLength = edge->getLength();
 
-                if(distances[currentVertexId] + edgeLength < distances[neighborVertexId]){
+                if(distances[currentVertex->getId()] + edgeLength < distances[neighborVertexId]){
 
-                    vector<Order> combinedOrders = orders[currentVertexId]; // Herda as ordens do pai
+                    vector<Order> combinedOrders = orders[currentVertex->getId()]; // Herda as ordens do pai
 
                     double availableCapacity = capacityAvailableDelivery - calculateTotalPriceAndWeight(combinedOrders).first;
                     vector<Order> neighborOrders = getMaxPriceOrdersLimitedByCenter(neighborVertex,availableCapacity,distributionCenter);
                     combinedOrders.insert(combinedOrders.end(), neighborOrders.begin(), neighborOrders.end());
 
                     orders[neighborVertexId] = combinedOrders;
-                    distances[neighborVertexId] = distances[currentVertexId] + edgeLength;
+                    distances[neighborVertexId] = distances[currentVertex->getId()] + edgeLength;
 
                     // Atualiza as melhores ordens se necessário
                     std::pair<double, double> priceAndWeight = calculateTotalPriceAndWeight(combinedOrders);
@@ -562,7 +563,7 @@ vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& rout
                         lowestCost = priceAndWeight.second;
                     }
 
-                    heap.push({distances[neighborVertexId], neighborVertexId});
+                    heap.push({distances[neighborVertexId], neighborVertex});
                 }
             }
             edge = edge->getNext();

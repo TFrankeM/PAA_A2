@@ -202,7 +202,51 @@ void escolhaOperacoes(GraphAdjList graph)
         case 4:
         {
             // operação 4
-            
+            cout << "Gostaria de adicionar entregas a uma rota feita com a operação 2 ou 3? (Digite 2 ou 3) ";
+            int op;
+            cin >> op;
+            if (op == 2)
+            {
+                Order order = getOrder(graph);
+    
+                cout << "Entregadores disponíveis: ";
+                for (int i = 0; i < graph.getDeliveryPeople().size(); i++)
+                {
+                    cout << graph.getDeliveryPeople()[i].getId() << " ";
+                }
+                cout << endl << "Escolha um entregador para realizar a entrega: ";
+                int deliveryPerson_id;
+                cin >> deliveryPerson_id;
+
+                DeliveryPerson deliveryPerson = graph.getDeliveryPerson(deliveryPerson_id);
+
+                vector<EdgeNode*> path = graphOp.defineSimpleDeliveryRoute(graph, order, deliveryPerson);
+
+                cout << "A rota mais curta para o entregador " << deliveryPerson.getId() << " é: " << endl;
+                for (int i = 0; i < path.size(); i++)
+                {
+                    cout << path[i]->otherVertex()->getId() << " ";
+                }
+            }
+            else if (op == 3)
+            {
+                Order order = getOrder(graph);
+                cout << "Escolha o número de entregadores mais próximos que você quer permitir: ";
+                int numDeliveryPeople;
+                cin >> numDeliveryPeople;
+
+                vector<Path> path = graphOp.findBestDeliveryRoutes(graph, order, graph.getDistributionCenters(), numDeliveryPeople);
+                cout << "O entregador que deve realizar a entrega é o " << path[0].deliveryPersonId << endl;
+                cout << "O centro de distribuição que deve ser visitado é o " << path[0].distributionCenterId << endl;
+                cout << "A rota que deve ser realizada é: " << endl;
+                for (int i = 0; i < path[0].route.size(); i++) cout << path[0].route[i] << " ";
+            }
+            else
+            {
+                cout << "Opção inválida. Tente novamente." << endl;
+            }
+
+            // vector<Order> orders = graphOp.findOrdersSugest(graph);
 
             break;
         }

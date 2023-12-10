@@ -39,7 +39,7 @@ DistributionCenter* Vertex::getDistributionCenter() { return distributionCenter;
 // Retorna o vendedor
 Seller* Vertex::getSeller() { return seller; }
 
-Retorna os pedidos ordenados pelo preco de todos clientes do vertice
+// Retorna os pedidos ordenados pelo preco de todos clientes do vertice
 vector<Order> Vertex::getCrescentePriceOrders() {
     vector<Order> allOrders;
     

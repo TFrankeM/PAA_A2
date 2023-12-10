@@ -23,6 +23,7 @@ public:
     // Método de acesso
     int getId() const;           // Pega o ID do entregador
     double getCapacity() const;     // Pega a capacidade máxima do entregador
+    double getCurrentCapacityAvailable() const; // Pega a capacidade atual disponível do entregador
 
     // Métodos aplicados na lista de pedidos
     bool assignOrder(const Order& order);       // Atribui um novo pedido ao entregador
