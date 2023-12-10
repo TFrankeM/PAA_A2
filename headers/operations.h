@@ -34,8 +34,12 @@ struct Route {
 // Classe GraphOperations para realizar operações no grafo
 class GraphOperations {
 public:
+    //////////////////////////////////////////////////////// 1 ////////////////////////////////////////////////////////
+
     // Encontra os n entregadores mais próximos de um dado vértice
     static vector<pair<DeliveryPerson, float>> findNearestDeliveryPeople(GraphAdjList& graph, Order order, int numDeliveryPeople);
+
+    //////////////////////////////////////////////////////// 2 ////////////////////////////////////////////////////////
 
     // Encontra a rota mais curta a partir de uma ordem e do entregador
     vector<EdgeNode*> defineSimpleDeliveryRoute(GraphAdjList& graph, Order order, DeliveryPerson deliveryPerson);
@@ -46,12 +50,26 @@ public:
     // funcao auxiliar para juntar sub-rotas menores da rota final
     void addToRoute(GraphAdjList& graph, vector<EdgeNode*>& route, vector<Vertex*> path);
 
+    //////////////////////////////////////////////////////// 3 ////////////////////////////////////////////////////////
+
     // Função que busca os n entregadores cujas rotas apresentem a menor distância total passando por algum 
     // centro de distribuição que contém o produto no seu inventário
     vector<Path> findBestDeliveryRoutes(GraphAdjList& graph, 
-                                        vector<DistributionCenter>& distributionCenters, 
-                                        Order order, 
+                                        const Order& order, 
+                                        const vector<DistributionCenter>& distributionCenters, 
                                         int numDeliveryPeople);
+
+    // Função para calcular as distâncias dos entregadores usando o algoritmo de Dijkstra
+    vector<Path> calculatesDijkstraDistance(GraphAdjList& graph, 
+                                           int centroDistribuicaoID, 
+                                           int centerAddress, 
+                                           int numDeliveryPeople,
+                                           int clientAddress);
+
+    // Função para reconstruir uma rota a partir dos pais dos vértices
+    vector<int> reconstruirRota(const vector<int>& parents, int vertex, int centerAddress); 
+
+    //////////////////////////////////////////////////////// 4 ////////////////////////////////////////////////////////
 
     // Sugere entregas adicionais
     vector<Order> findOrdersSugest(GraphAdjList& graph, Route& route); 
