@@ -59,3 +59,8 @@ bool MaxHeap::empty() const {
     return size == 0;
 }
 
+// Obtém o tamanho do heap
+int MaxHeap::getSize() const {
+    return size;
+}
+
