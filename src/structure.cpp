@@ -39,6 +39,27 @@ DistributionCenter* Vertex::getDistributionCenter() { return distributionCenter;
 // Retorna o vendedor
 Seller* Vertex::getSeller() { return seller; }
 
+// Retorna os pedidos ordenados pelo preco de todos clientes do vertice
+vector<Order> Vertex::getCrescentePriceOrders() {
+    vector<Order> allOrders;
+    
+    vector<Client> clients =  this -> getClients(); 
+    for (const Client& client : clients) {
+        vector<Order> clientOrders = client.getOrders(); 
+        // Itera sobre cada ordem do cliente e adiciona ao vetor allOrders
+        for (const Order& order : clientOrders) {
+            allOrders.push_back(order);
+        }
+    }
+
+    // Ordena as ordens com base no preço do produto em ordem crescente
+    std::sort(allOrders.begin(), allOrders.end(), [](const Order& a, const Order& b) {
+    return a.getProduct().getPrice() < b.getProduct().getPrice();
+    });
+
+    // Retorna o vetor de ordens ordenado
+    return allOrders;
+}
 // ==============================================
 
 
