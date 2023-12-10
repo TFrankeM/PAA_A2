@@ -5,7 +5,8 @@
 #include <algorithm>
 
 // Estrutura para armazenar 
-struct Path {
+struct Path 
+{
     int deliveryPersonId;           // ID do entregador
     int distributionCenterId;       // Central de distribuição
     std::vector<int> route;         // Lista com as arestas (rota)

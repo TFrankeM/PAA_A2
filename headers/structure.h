@@ -30,6 +30,7 @@ public:
     DeliveryPerson* getDeliveryPerson(); // Retorna o entregador
     DistributionCenter* getDistributionCenter(); // Retorna o centro de distribuição
     Seller* getSeller(); // Retorna o vendedor
+    vector<Order> Vertex::getCrescentePriceOrders(); // Retorna os pedidos em ordem crescente de preço
 };
 
 /* EdgeNode Header*/
@@ -60,6 +61,7 @@ private:
     vector<Client> m_clients;
     vector<Seller> m_sellers;
     vector<DeliveryPerson> m_deliveryPeople;
+    vector<DistributionCenter> m_distributionCenters;
     EdgeNode** m_edges;
 
 public:
@@ -90,6 +92,9 @@ public:
     void addDeliveryPerson(const DeliveryPerson& deliveryPerson); // Adiciona um entregador
     DeliveryPerson getDeliveryPerson(const int& deliveryPersonId); // Pega um entregador
     vector<DeliveryPerson> getDeliveryPeople();       // Pega todos os entregadores
+
+    void addDistributionCenter(const DistributionCenter& distributionCenter); // Adiciona um centro de distribuição
+    vector<DistributionCenter> getDistributionCenters(); // Pega todos os centros de distribuição
     
     void print();                                     // Imprime o grafo
 };

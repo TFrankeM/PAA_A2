@@ -134,6 +134,7 @@ void readDistributionCenter(GraphAdjList& g, stringstream& iss)
     // Adiciona o vértice do centro de distribuição
     Vertex* adress = g.addVertex(vertex1, vertex2, distance);
     adress->addDistributionCenter(dc);
+    g.addDistributionCenter(dc);
 }
 
 

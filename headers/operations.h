@@ -1,11 +1,11 @@
 #ifndef GRAPHOPERATIONS_H
 #define GRAPHOPERATIONS_H
 
-#include "../headers/distributioncenter.h"
-#include "../headers/structure.h"
-#include "../headers/minheap.h"
-#include "../headers/maxheap.h"
-#include "../headers/order.h"
+#include "distributioncenter.h"
+#include "structure.h"
+#include "minheap.h"
+#include "maxheap.h"
+#include "order.h"
 #include <vector>
 
 
@@ -67,7 +67,7 @@ public:
                                            int clientAddress);
 
     // Função para reconstruir uma rota a partir dos pais dos vértices
-    vector<int> reconstruirRota(const vector<int>& parents, int vertex, int centerAddress); 
+    vector<int> reconstruirRota(const vector<Vertex*>& parents, Vertex* vertex, Vertex* centerVertex); 
 
     //////////////////////////////////////////////////////// 4 ////////////////////////////////////////////////////////
 

@@ -18,26 +18,26 @@ void menuPrincipal()
             << "38 arestas \n"
             << "1 clientes \n" 
             << "6 entregadores \n"
-            << "1 vendedores \n"
-            << "- centrais de distribuição \n" 
+            << "2 vendedores \n"
+            << "1 centrais de distribuição \n" 
             << endl;
 
     cout << "Cenário 2: \n"
-            << "20 vértices \n"
+            << "18 vértices \n"
             << "39 arestas \n"
-            << "- clientes \n" 
+            << "2 clientes \n" 
             << "4 entregadores \n"
-            << "1 vendedores \n"
-            << "- centrais de distribuição \n" 
+            << "2 vendedores \n"
+            << "3 centrais de distribuição \n" 
             << endl;
     
     cout << "Cenário 3: \n"
             << "20 vértices \n"
             << "31 arestas \n"
-            << "- clientes \n" 
-            << "6 entregadores \n"
-            << "1 vendedores \n"
-            << "- centrais de distribuição \n" 
+            << "6 clientes \n" 
+            << "8 entregadores \n"
+            << "2 vendedores \n"
+            << "5 centrais de distribuição \n" 
             << endl;
 
     cout << "Para sair do aplicativo digite 4\n" << endl;
@@ -98,7 +98,10 @@ void menuOperacoes()
          << "==> Definir a rota de uma entrega considerando centros de distribuição \n" << endl; 
     
     cout << "Operação 4: \n" 
-         << "==> Sugerir entregas adicionais com base em uma rota \n" << endl; 
+         << "==> Sugerir entregas adicionais com base em uma rota \n" << endl;
+
+    cout << "Operação 5: \n" 
+         << "==> Imprimir o grafo \n" << endl;
 }
 
 Order getOrder(GraphAdjList graph)
@@ -143,7 +146,10 @@ void escolhaOperacoes(GraphAdjList graph)
         {
             // operação 1
             Order order = getOrder(graph);
-            vector<pair<DeliveryPerson, float>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, 2);
+            cout << "Escolha o número de entregadores mais próximos que você deseja encontrar: ";
+            int numDeliveryPeople;
+            cin >> numDeliveryPeople;
+            vector<pair<DeliveryPerson, float>> DeliveryPeople = graphOp.findNearestDeliveryPeople(graph, order, numDeliveryPeople);
 
             // Imprime os entregadores mais próximos
             cout << "Os entregadores mais próximos são: " << endl;
@@ -181,14 +187,29 @@ void escolhaOperacoes(GraphAdjList graph)
         }
         case 3:
         {
-            cout << "Excelente opção!!!" << endl; 
             // operação 3
-            break;
+            Order order = getOrder(graph);
+            cout << "Escolha o número de entregadores mais próximos que você quer permitir: ";
+            int numDeliveryPeople;
+            cin >> numDeliveryPeople;
+
+            vector<Path> path = graphOp.findBestDeliveryRoutes(graph, order, graph.getDistributionCenters(), numDeliveryPeople);
+            cout << "O entregador que deve realizar a entrega é o " << path[0].deliveryPersonId << endl;
+            cout << "O centro de distribuição que deve ser visitado é o " << path[0].distributionCenterId << endl;
+            cout << "A rota que deve ser realizada é: " << endl;
+            for (int i = 0; i < path[0].route.size(); i++) cout << path[0].route[i] << " ";
         }
         case 4:
         {
-            cout << "Excelente opção!!!" << endl; 
             // operação 4
+            
+
+            break;
+        }
+        case 5:
+        {
+            // operação 5
+            graph.print();
             break;
         }
         default:

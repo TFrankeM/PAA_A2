@@ -305,13 +305,15 @@ vector<Path> GraphOperations::calculatesDijkstraDistance(GraphAdjList& graph,
     // Lista de vertices visitados
     vector<bool> visited(m_numVertices, false);
     // Lista de vértices pais
-    vector<int> parents(m_numVertices, -1);
+    vector<Vertex*> parents(m_numVertices, nullptr);
 
     // Distância e pai do vértice do centro é 0 e ele mesmo, respectivamente
+    Vertex* centerVertex = graph.getVertex(centerAddress);
     distances[centerAddress] = 0;
-    parents[centerAddress] = centerAddress;
+    parents[centerAddress] = centerVertex;
 
-    heap.push({0, centerAddress});
+
+    heap.push({0, centerVertex});
 
     // Lista com os entregadores encontrados até o momento
     vector<Path> deliveryPeopleFound;
@@ -327,79 +329,75 @@ vector<Path> GraphOperations::calculatesDijkstraDistance(GraphAdjList& graph,
     // o cliente não foi visitado
     while (!heap.empty() && deliveryPeopleFound.size() < numDeliveryPeople && !clientVisited) {
         // Removemos o vértice com a menor distância do heap
-        Vertex currentVertex = heap.top().second;
+        Vertex* currentVertex = heap.top().second;
         heap.pop();
 
         // Se o vértice atual já foi visitado, ignoramos ele
-        if (visited[currentVertex.getId()]) 
+        if (visited[currentVertex->getId()]) 
         {
             continue;
         }
 
         // Define o vértice atual como visitado
-        visited[currentVertex.getId()] = true;
+        visited[currentVertex->getId()] = true;
 
         // Se a distância do vértice atual é máxima, já visitamos todos os vértices possíveis
-        if (distances[currentVertex.getId()]  == infinito) {
+        if (distances[currentVertex->getId()]  == infinito) {
             break;
         }
 
-        // Lista de entregadores no vértice atual
-        vector<DeliveryPerson> deliveryPeople = currentVertex.getDeliveryPeople();
+        // Entregador do vértice atual
+        DeliveryPerson* deliveryPerson = currentVertex->getDeliveryPerson();
 
         // Percorremos a lista deliveryPeople adicionando o entregador a lista de entregadores selecionados 
         // se o número de entregadores procurado não tiver sido atingido
 
-        // 'deliveryPerson' é o atual elemento de 'deliveryPeople'
-        for (const DeliveryPerson& deliveryPerson : deliveryPeople) 
+        // Adiciona <Entregador, distância> à lista de selecionados se ela não estiver cheia
+        if (deliveryPeopleFound.size() < numDeliveryPeople) 
         {
-            // Adiciona <Entregador, distância> à lista de selecionados se ela não estiver cheia
-            if (deliveryPeopleFound.size() < numDeliveryPeople) 
-            {
-                // reconstruirRota: reconstroi a rota do centro de distribuição até o entregador (só que no sentido oposto)
-                // Salvamos na lista de entregadores
-                vector<int> pathToDeliveryPerson = reconstruirRota(parents, currentVertex.getId(), centerAddress);
-                int totalDistanceToDeliveryPerson = distances[currentVertex.getId()];
-                // Salva o entregador, o caminho até ele e a distância total até o momento.
-                deliveryPeopleFound.push_back({deliveryPerson.getId(), distributionCenterID, pathToDeliveryPerson, totalDistanceToDeliveryPerson});
-            } 
-            else 
-            {
-                break; // Sai do loop se foram encontradas pessoas suficientes
-            }
+            // reconstruirRota: reconstroi a rota do centro de distribuição até o entregador (só que no sentido oposto)
+            // Salvamos na lista de entregadores
+            vector<int> pathToDeliveryPerson = reconstruirRota(parents, currentVertex, centerVertex);
+            int totalDistanceToDeliveryPerson = distances[currentVertex->getId()];
+            // Salva o entregador, o caminho até ele e a distância total até o momento.
+            deliveryPeopleFound.push_back({deliveryPerson->getId(), distributionCenterID, pathToDeliveryPerson, totalDistanceToDeliveryPerson});
+        } 
+        else 
+        {
+            break; // Sai do loop se foram encontradas pessoas suficientes
         }
         
         // Se o vértice é o endereço do cliente
-        if (currentVertex.getId() == clientAddress) 
+        if (currentVertex->getId() == clientAddress) 
         {
             // Ele foi visitado
             clientVisited = true;
 
-            pathClient = reconstruirRota(parents, currentVertex.getId(), centerAddress);
-            distanceClient = distances[currentVertex.getId()];
+            pathClient = reconstruirRota(parents, currentVertex, centerVertex);
+            distanceClient = distances[currentVertex->getId()];
         }
 
         // Iterate pelas arestas do vértice atual
-        for (EdgeNode* edge = graph.getEdges(currentVertex.getId()); edge != nullptr; edge = edge->getNext())
+        for (EdgeNode* edge = graph.getEdges(currentVertex->getId()); edge != nullptr; edge = edge->getNext())
         {
             // Pega o índice do vértice vizinho
-            Vertex neighborVertex = edge->otherVertex();
+            Vertex* neighborVertex = edge->otherVertex();
 
             // Se o vizinho não foi visitado ainda
-            if(!visited[neighborVertex.getId()])
+            if(!visited[neighborVertex->getId()])
             {
                 // Acessamos o comprimento da aresta
                 int edgeLength = edge->getLength();
 
                 // Se a distância de v1 + comprimento da rua < v2 atual
-                if (distances[currentVertex.getId()] + edgeLength < distances[neighborVertex.getId()]) 
+                if (distances[currentVertex->getId()] + edgeLength < distances[neighborVertex->getId()]) 
                 {
                     // Atualizamos v2 = distância de v1 + comprimento da rua
-                    distances[neighborVertex.getId()] = distances[currentVertex.getId()] + edgeLength;
+                    distances[neighborVertex->getId()] = distances[currentVertex->getId()] + edgeLength;
                     // Redefinimos o pai do vértice
-                    parents[neighborVertex.getId()] = currentVertex.getId();
+                    parents[neighborVertex->getId()] = currentVertex;
                     // Adicionamos o novo vértice à lista
-                    heap.push({distances[neighborVertex.getId()], neighborVertex});
+                    heap.push({distances[neighborVertex->getId()], neighborVertex});
                 }
             }
         }
@@ -419,17 +417,17 @@ vector<Path> GraphOperations::calculatesDijkstraDistance(GraphAdjList& graph,
 }
 
 // Função para reconstruir uma rota a partir dos pais dos vértices
-vector<int> GraphOperations::reconstruirRota(const vector<int>& parents, int vertex, int centerAddress) 
+vector<int> GraphOperations::reconstruirRota(const vector<Vertex*>& parents, Vertex* vertex, Vertex* centerVertex) 
 {
     vector<int> route;
 
     // Percorre iterativamente adicionando vértice à rota
-    while (parents[vertex] != centerAddress) 
+    while (parents[vertex->getId()]->getId() != centerVertex->getId()) 
     {
-        route.push_back(vertex);
-        vertex = parents[vertex];
+        route.push_back(vertex->getId());
+        vertex = parents[vertex->getId()];
     }
-    route.push_back(centerAddress);
+    route.push_back(centerVertex->getId());
 
     reverse(route.begin(), route.end());
     return route;

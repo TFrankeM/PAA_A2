@@ -1,6 +1,9 @@
 #vértices 18
-#vendedores 1
+#vendedores 2
 #entregadores 4
+#CDs 3
+#clientes 2
+
 
 vértice 1 1.0 1.0
 vértice 2 2.0 1.0

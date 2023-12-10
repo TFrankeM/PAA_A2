@@ -39,17 +39,14 @@ DistributionCenter* Vertex::getDistributionCenter() { return distributionCenter;
 // Retorna o vendedor
 Seller* Vertex::getSeller() { return seller; }
 
-// Retorna os pedidos ordenados pelo preco de todos clientes do vertice
+Retorna os pedidos ordenados pelo preco de todos clientes do vertice
 vector<Order> Vertex::getCrescentePriceOrders() {
     vector<Order> allOrders;
     
-    vector<Client> clients =  this -> getClients(); 
-    for (const Client& client : clients) {
-        vector<Order> clientOrders = client.getOrders(); 
-        // Itera sobre cada ordem do cliente e adiciona ao vetor allOrders
-        for (const Order& order : clientOrders) {
-            allOrders.push_back(order);
-        }
+    vector<Order> clientOrders = client->getOrders(); 
+    // Itera sobre cada ordem do cliente e adiciona ao vetor allOrders
+    for (const Order& order : clientOrders) {
+        allOrders.push_back(order);
     }
 
     // Ordena as ordens com base no preço do produto em ordem crescente
@@ -353,3 +350,16 @@ void GraphAdjList::print()
     }
 }
 
+// Adiciona um centro de distribuição ao grafo
+void GraphAdjList::addDistributionCenter(const DistributionCenter& distributionCenter)
+{
+    // Verifica se o centro de distribuição já existe
+    auto it = find_if(m_distributionCenters.begin(), m_distributionCenters.end(), [&distributionCenter](const DistributionCenter& dc) { return dc.getId() == distributionCenter.getId(); });
+    if (it != m_distributionCenters.end()) throw runtime_error("Centro de distribuição já existe");
+
+    // Adiciona o centro de distribuição ao grafo
+    m_distributionCenters.push_back(distributionCenter);
+}
+
+// Pega todos os centros de distribuição do grafo
+vector<DistributionCenter> GraphAdjList::getDistributionCenters() { return m_distributionCenters; }
