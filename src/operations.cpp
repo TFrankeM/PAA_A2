@@ -444,131 +444,161 @@ vector<int> GraphOperations::reconstruirRota(const vector<Vertex*>& parents, Ver
 */
 
 
-std::pair<double, double> calculateTotalPriceAndWeight(const vector<Order>& orders) {
-    double totalPrice = 0.0;
-    double totalWeight = 0.0;
+
+// Função para filtrar os pedidos disponíveis com base na disponibilidade do produto na distribuidora
+vector<Order> filterOrdersByAvailability(const vector<Order>& orders, const DistributionCenter& distributionCenter) {
+    vector<Order> availableOrders;
 
     for (const Order& order : orders) {
-        totalPrice += order.getProduct().getPrice();
-        totalWeight += order.getProduct().getWeight();
+        // Obtém o ID do produto do pedido
+        int orderProduct = order.getProduct().getId();
+
+        // Verifica se o produto está disponível na distribuidora
+        if (distributionCenter.isProductAvailable(orderProduct)) {
+            // O produto está disponível na distribuidora, adicione o pedido à lista de pedidos disponíveis
+            availableOrders.push_back(order);
+        }
     }
 
-    return std::make_pair(totalPrice, totalWeight);
+    return availableOrders;
 }
 
+// Função para ordenar pedidos pelo preço por peso em ordem decrescente
+bool orderByPricePerWeight(const Order a, const Order b) {
+    // Calcule a taxa de preço por peso para os pedidos 'a' e 'b'
+    double rateA = (a.getProduct().getPrice() / a.getProduct().getWeight());
+    double rateB = (b.getProduct().getPrice() / b.getProduct().getWeight());
 
+    // Ordene os pedidos pelo preço por peso em ordem decrescente
+    return rateA > rateB;
+}
 
+// Função para selecionar pedidos que maximizam o preço dentro de um limite de peso
+vector<Order> getMaxPriceOrdersLimitedByCenter(const vector<Order> orders, double weightLimit) {
+    // Ordene os pedidos pelo preço por peso em ordem decrescente
+    vector<Order> sortedOrders = orders;
+    std::sort(sortedOrders.begin(), sortedOrders.end(), orderByPricePerWeight);
 
-vector<Order> GraphOperations::getMaxPriceOrdersLimitedByCenter(Vertex* vertex, double weightLimit, DistributionCenter& distributionCenter) {
-        vector<Order> orders = vertex->getCrescentePriceOrders();
+    vector<Order> selectedOrders;
+    double currentWeight = 0.0;
+    double totalPrice = 0.0;
 
-        vector<Order> bestCombo;
-        double bestPrice = 0.0;
-
-        // Calcula todas as combinações possíveis
-        int n = orders.size();
-        for (int i = 0; i < (1 << n); ++i) {
-
-            vector<Order> currentCombo;
-            double currentWeight = 0.0, currentPrice = 0.0;
-
-            for (int j = 0; j < n; ++j) {
-                if (i & (1 << j)) {
-                    Product product = orders[j].getProduct();
-                    currentWeight += product.getWeight();
-                    currentPrice += product.getPrice();
-                    bool productAvalible = distributionCenter.isProductAvailable(product.getId());
-
-                    if (currentWeight <= weightLimit && productAvalible) {
-                        currentCombo.push_back(orders[j]);
-                    } else {
-                        // Se o peso exceder o limite, descarte esta combinação
-                        break;
-                    }
-                }
-            }
-
-            if (currentWeight <= weightLimit && currentPrice > bestPrice) {
-                bestCombo = currentCombo;
-                bestPrice = currentPrice;
-            }
+    for (const Order order : sortedOrders) {
+        if (currentWeight + order.getProduct().getWeight() <= weightLimit) {
+            // Se o pedido couber na moto, adicione-o à lista de pedidos selecionados
+            selectedOrders.push_back(order);
+            currentWeight += order.getProduct().getWeight();
+            totalPrice += order.getProduct().getPrice();
+        } else {
+            // Se o pedido não couber na moto, continue para o próximo pedido
+            continue;
         }
+    }
 
-        return bestCombo;
+    return selectedOrders;
 }
 
-
-
+// Função para encontrar as melhores ordens com base em uma rota e capacidade disponível
+// Esta funcao considera apenas o faturamento (sem custo)
 vector<Order> GraphOperations::findOrdersSugest(GraphAdjList& graph, Route& route){
-    
 
-    Order order = route.getOrder();  
+    // Obtém o pedido da rota
+    Order order = route.getOrder(); 
+    // Obtém o ID do vértice de início do cliente
     int startVertexId = order.getClientAddress();
+    // Obtém o vértice de início a partir do ID
     Vertex* startVertex = graph.getVertex(startVertexId);
+    // Obtém informações do entregador da rota
     DeliveryPerson deliveryperson = route.getDeliveryPerson();  
+    // Obtém informações do centro de distribuição da rota
     DistributionCenter distributionCenter = route.getDistributionCenter();  
 
+    // Cria uma pilha de prioridade (Heap) para a busca
     MinHeap heap;
     
-    double capacityAvailableDelivery = deliveryperson.getCurrentCapacityAvailable();
+    // Calcula a capacidade disponível de entrega do entregador
+    double capacityAvailableDelivery = deliveryperson.getCapacity() - order.getTotalWeight();
+    
+    // Inicializa vetores para armazenar informações sobre os vértices visitados e pedidos
     vector<int> distances(graph.getNumVertices(), INT_MAX);
     vector<bool> visited(graph.getNumVertices(), false);
     vector<vector<Order>> orders(graph.getNumVertices()); // Inicializa um vetor de vetores de Order
     vector<double> totalrevenue(graph.getNumVertices(), 0.0); // Inicializa com zero
 
+    // Vetores para armazenar as melhores ordens e seu valor
     vector<Order> bestOrders;
     double bestValue = 0.0;
-    double lowestCost = std::numeric_limits<double>::max();
 
+    // Inicializa a distância para o vértice de início como 0 e o adiciona à pilha de prioridade
     distances[startVertexId] = 0;
     heap.push({distances[startVertexId], startVertex});
 
-
+    // Início da busca
     while (!heap.empty()) {
         
-        Vertex* currentVertex = heap.top().second; // Vertice com valor minimo
-        heap.pop(); // Remove Verice do Heap
+        // Obtém o vértice com a menor distância da pilha de prioridade
+        Vertex* currentVertex = heap.top().second; 
+        heap.pop(); // Remove o vértice da pilha
 
-        if (distances[currentVertex->getId()] == INT_MAX) { break; }
-
+        // Se o vértice já foi visitado, continua para o próximo
         if (visited[currentVertex->getId()]) continue;
         visited[currentVertex->getId()] = true;
 
-
+        // Obtém as arestas do vértice atual
         EdgeNode* edge = graph.getEdges(currentVertex->getId());
 
-
+        // Itera sobre as arestas
         while(edge){
+            // Obtém o vértice vizinho
             Vertex* neighborVertex = edge->otherVertex();
-            int neighborVertexId = neighborVertex->getId();
-            if (!visited[neighborVertexId]) {
+            
+            // Se o vizinho não foi visitado
+            if (!visited[neighborVertex->getId()]) {
                 int edgeLength = edge->getLength();
 
-                if(distances[currentVertex->getId()] + edgeLength < distances[neighborVertexId]){
+                // Se a distância atual for menor do que a armazenada, atualiza a distância
+                if(distances[currentVertex->getId()] + edgeLength < distances[neighborVertex->getId()]){
 
-                    vector<Order> combinedOrders = orders[currentVertex->getId()]; // Herda as ordens do pai
+                    // Combina as ordens do vértice atual com as do vizinho
+                    vector<Order> combinedOrders = orders[currentVertex->getId()];
 
+                    // Calcula a capacidade disponível após a coleta de pedidos no vértice atual
                     double availableCapacity = capacityAvailableDelivery - calculateTotalPriceAndWeight(combinedOrders).first;
-                    vector<Order> neighborOrders = getMaxPriceOrdersLimitedByCenter(neighborVertex,availableCapacity,distributionCenter);
-                    combinedOrders.insert(combinedOrders.end(), neighborOrders.begin(), neighborOrders.end());
 
-                    orders[neighborVertexId] = combinedOrders;
-                    distances[neighborVertexId] = distances[currentVertex->getId()] + edgeLength;
+                    // Obtém os pedidos do cliente do vértice vizinho
+                    Client* neighborVertexClient = neighborVertex->getClient();
+                    vector<Order> neighborVertexOrders = neighborVertexClient->getOrders();
+
+                    // Filtra os pedidos disponíveis no centro de distribuição
+                    vector<Order> neighborVertexOrdersAvalible = filterOrdersByAvailability(neighborVertexOrders,  distributionCenter);
+
+                    // Seleciona os pedidos com maior preço dentro da capacidade disponível
+                    vector<Order> neighborVertexOrdersSelect = getMaxPriceOrdersLimitedByCenter(neighborVertexOrdersAvalible, availableCapacity); 
+
+                    // Combina as ordens do vértice atual com as do vizinho
+                    combinedOrders.insert(combinedOrders.end(), neighborVertexOrdersSelect.begin(), neighborVertexOrdersSelect.end());
+
+                    // Armazena as ordens combinadas no vértice vizinho
+                    orders[neighborVertex->getId()] = combinedOrders;
+                    // Atualiza a distância até o vértice vizinho
+                    distances[neighborVertex->getId()] = distances[currentVertex->getId()] + edgeLength;
 
                     // Atualiza as melhores ordens se necessário
                     std::pair<double, double> priceAndWeight = calculateTotalPriceAndWeight(combinedOrders);
-                    if (priceAndWeight.first > bestValue || (priceAndWeight.first == bestValue && priceAndWeight.second < lowestCost)) {
+                    if (priceAndWeight.first > bestValue ) {
                         bestOrders = combinedOrders;
                         bestValue = priceAndWeight.first;
-                        lowestCost = priceAndWeight.second;
                     }
 
-                    heap.push({distances[neighborVertexId], neighborVertex});
+                    // Adiciona o vértice vizinho à pilha de prioridade
+                    heap.push({distances[neighborVertex->getId()], neighborVertex});
                 }
             }
             edge = edge->getNext();
         }
     }
 
+    // Retorna as melhores ordens encontradas
     return bestOrders;
 }
+
